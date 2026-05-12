@@ -27,8 +27,16 @@ function makeClient() {
   });
 }
 
-export const db = globalForPrisma.prisma ?? makeClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
-}
+// Lazy proxy: defer client creation (and the DATABASE_URL check) until the
+// first property access. This keeps `import { db }` side-effect-free so the
+// Next.js build can collect route metadata without a live DATABASE_URL.
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = globalForPrisma.prisma ?? makeClient();
+    if (process.env.NODE_ENV !== "production") {
+      globalForPrisma.prisma = client;
+    }
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
