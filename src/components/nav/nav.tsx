@@ -41,7 +41,7 @@ export function Nav() {
         {/* Desktop — right side: signin + region + CTA */}
         <div className="hidden shrink-0 items-center gap-3 md:flex">
           <RegionPicker />
-          <Link href="/signin" className="text-sm text-ink-2 hover:text-ink">
+          <Link href="/login" className="text-sm text-ink-2 hover:text-ink">
             {t("signIn")}
           </Link>
           <Btn href="/signup">{t("ctaTrial")}</Btn>
