@@ -5,12 +5,16 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { validatePayload, type GameType } from "@/lib/quiz-schemas";
+import { requireAdmin } from "@/lib/auth";
 
-// TODO(auth): once Clerk lands, replace this with a session-based check
-// that resolves the parent and confirms Parent.role === "ADMIN".
 const DEMO_ADMIN_ID = "seed-parent-demo";
 
 async function requireAdminUserId(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_AUTH_ENABLED === "true") {
+    const parent = await requireAdmin();
+    return parent.clerkUserId;
+  }
+  // Demo path — preserved for cutover rollback.
   const parent = (await db.parent.findUnique({
     where: { id: DEMO_ADMIN_ID },
     select: { id: true, role: true, clerkUserId: true },
