@@ -5,7 +5,7 @@ type Quiz = {
   id: string;
   title: string;
   subjectKey: "rekenen" | "taal" | "lezen" | "engels" | "wereld";
-  gameType: "mc" | "type" | "match" | "drag-order";
+  gameType: "mc" | "type" | "match" | "drag-order" | "catapult";
   duration: string;
   questions: number;
   isNew?: boolean;

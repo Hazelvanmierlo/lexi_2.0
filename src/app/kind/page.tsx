@@ -150,11 +150,7 @@ function toQuizCard(q: DbQuiz) {
     id: q.id,
     title: q.title,
     subjectKey: subjectToUi(q.subject),
-    gameType: gameTypeToUi(q.gameType) as
-      | "mc"
-      | "type"
-      | "match"
-      | "drag-order",
+    gameType: gameTypeToUi(q.gameType),
     duration: estimateDuration(q.gameType),
     questions: 10,
     isNew: q.createdAt.getTime() >= newCutoff,
