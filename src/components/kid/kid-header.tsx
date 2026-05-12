@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Coins } from "lucide-react";
 import { MascotImage } from "@/components/ui/mascot";
+import { WisselButton } from "@/components/kind-picker/wissel-button";
 
 type Props = { coins: number };
 
@@ -14,6 +15,7 @@ export function KidHeader({ coins }: Props) {
           <span className="font-display text-lg font-bold tracking-tight text-ink">Lexi.kids</span>
         </div>
         <div className="flex items-center gap-3">
+          <WisselButton />
           <div className="flex items-center gap-1.5 rounded-full bg-sun-soft px-3 py-1.5 text-sm font-semibold text-ink">
             <Coins className="h-4 w-4" />
             <span>{coins}</span>
