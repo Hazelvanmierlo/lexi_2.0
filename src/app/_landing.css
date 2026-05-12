@@ -1,0 +1,105 @@
+/* _landing.css — landing-only keyframes + reduced-motion gates */
+
+@keyframes lexi-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.lexi-fade-up { animation: lexi-fade-up 300ms ease-out both; }
+
+/* Mascot float — gentle bob + tilt. Used by MascotImage motion="float". */
+@keyframes lexi-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%      { transform: translateY(-8px) rotate(1deg); }
+}
+
+.lexi-float {
+  display: inline-block;
+  animation: lexi-float 4.2s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Reward badge pop-in — used by RewardLoop "+ hoed". */
+@keyframes lexi-pop-in {
+  from { opacity: 0; transform: scale(0.85) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.lexi-pop-in { animation: lexi-pop-in 320ms cubic-bezier(.2,.9,.3,1.2) both; }
+
+/* Catapult ball flight — launches from the centre, arcs up + out to the picked
+   target. CSS variables let the component say where the target sits. */
+@keyframes catapult-fly {
+  0%   { left: 50%;             bottom: 2rem; transform: translate(-50%, 0) scale(1); opacity: 1; }
+  60%  { bottom: 12rem;          transform: translate(-50%, 0) scale(1.05); }
+  100% { left: var(--target-left, 50%); bottom: 9rem; transform: translate(-50%, 0) scale(0.6); opacity: 0; }
+}
+
+.catapult-ball { animation: catapult-fly 700ms cubic-bezier(.3,.7,.4,1) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .catapult-ball { animation: none !important; opacity: 0 !important; }
+}
+
+/* Quiz-play polish — each new question fades + slides in.
+   Triggered by a React key change so the keyframe replays per question. */
+@keyframes question-enter {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.question-enter { animation: question-enter 220ms ease-out both; }
+
+/* Coin pop — used on the correct-answer feedback bar. A single coin element
+   floats up and fades, evoking the wallet gaining a coin. */
+@keyframes coin-pop {
+  0%   { opacity: 0; transform: translateY(0)   scale(0.6); }
+  20%  { opacity: 1; transform: translateY(-8px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-36px) scale(0.9); }
+}
+
+.coin-pop { animation: coin-pop 900ms ease-out both; }
+
+/* Mini-confetti — three coloured dots that flick outward from a centre point.
+   Each .confetti-bit element supplies its own --dx and --dy variables. */
+@keyframes confetti-bit {
+  from { opacity: 1; transform: translate(0, 0) scale(1); }
+  to   {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, -40px)) scale(0.4);
+  }
+}
+
+.confetti-bit { animation: confetti-bit 700ms ease-out both; }
+
+/* Coin counter pulse — the KidHeader badge gets this whenever the displayed
+   value goes up. Triggered by a key change. */
+@keyframes coin-count-pulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+.coin-count-pulse { animation: coin-count-pulse 360ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .question-enter,
+  .coin-pop,
+  .confetti-bit,
+  .coin-count-pulse {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lexi-fade-up,
+  .lexi-float,
+  .lexi-pop-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

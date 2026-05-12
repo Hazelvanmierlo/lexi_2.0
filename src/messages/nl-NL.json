@@ -1,0 +1,391 @@
+{
+  "nav": {
+    "selectRegion": "Kies regio",
+    "netherlands": "Nederland",
+    "belgium": "België",
+    "menu": "Menu",
+    "howItWorks": "Hoe het werkt",
+    "together":   "Samen oefenen",
+    "subjects":   "Vakken",
+    "shop":       "Shop",
+    "pricing":    "Prijs",
+    "faq":        "FAQ",
+    "signIn":     "Inloggen",
+    "ctaTrial":   "Start gratis"
+  },
+  "common": {
+    "company": "Lexi.kids B.V. — Amsterdam",
+    "groep": "groep",
+    "groepRange": "1 t/m 8",
+    "curriculum": "SEO leerlijn 2026"
+  },
+  "footer": {
+    "products": "Producten",
+    "forParents": "Voor ouders",
+    "company": "Bedrijf",
+    "legal": "Juridisch",
+    "links": {
+      "landing": "Lexi.kids",
+      "shop": "Shop",
+      "tryQuestion": "Probeer een vraag",
+      "pricing": "Prijzen",
+      "blog": "Blog",
+      "about": "Over ons",
+      "contact": "Contact",
+      "terms": "Voorwaarden",
+      "privacy": "Privacybeleid",
+      "cookies": "Cookies"
+    },
+    "tagline": "Slim oefenen voor groep 1 t/m 8.",
+    "copyright": "© 2026 Lexi.kids. Alle rechten voorbehouden."
+  },
+  "hero": {
+    "kicker": "Samen oefenen, niet erbij zitten",
+    "title": "Het oefenprogramma waar je kind zélf om vraagt.",
+    "subhead": "Lexi past elke vraag aan op het niveau van je kind. Jij krijgt elke week één gespreksstarter — om samen aan tafel te bespreken, niet om te controleren.",
+    "ctaTrial": "Start 14 dagen gratis",
+    "ctaTry": "Probeer een vraag",
+    "price": "€11,95 / maand · hele gezin",
+    "trust": {
+      "noCard": "Geen creditcard",
+      "monthly": "Per maand opzegbaar",
+      "wholeFamily": "Hele gezin"
+    },
+    "frame": {
+      "statusTime": "9:41",
+      "statusLabel": "Lexi · Rekenen",
+      "progressLabel": "vraag 7 / 10",
+      "levelLabel": "niveau 4",
+      "topic": "Breuken vergelijken",
+      "question": "Welk deel is groter?",
+      "options": ["3 / 4", "2 / 3", "Even groot"],
+      "correctIdx": 0,
+      "feedback": "Goed gedaan!",
+      "reward": {
+        "title": "+12 munten · Goed bezig!",
+        "sub": "Nieuw avatar-onderdeel ontgrendeld."
+      }
+    },
+    "parentPing": {
+      "kicker": "Bericht voor jou",
+      "body": "Sara had moeite met breuken vergelijken. Vraag haar vanavond: 'Wat is meer: 3/4 of 2/3?'"
+    }
+  },
+  "productLoop": {
+    "eyebrow": "Een doordeweekse avond",
+    "title": "Zo ziet 15 minuten met Lexi eruit.",
+    "lead": "Geen losse oefenboekjes, geen YouTube. Eén vast moment per dag — kort, voorspelbaar en altijd op het juiste niveau.",
+    "items": [
+      { "time": "0:00",  "step": "stap 1", "title": "Lexi groet je kind",          "body": "Korte intro, herkenbare avatar. Geen pop-ups, geen reclame." },
+      { "time": "0:30",  "step": "stap 2", "title": "10 vragen, allemaal op niveau", "body": "Multiple choice, intypen, slepen, schieten — afwisseling per vraag." },
+      { "time": "5:00",  "step": "stap 3", "title": "Mini-game als beloning",       "body": "Twee minuten ontspanning. Geen gokkast-mechaniek; gewoon leuk." },
+      { "time": "12:00", "step": "stap 4", "title": "Eén bericht voor jou",         "body": "Lexi stuurt je één concrete gespreksstarter — niet meer dan dat." }
+    ]
+  },
+  "rewardLoop": {
+    "eyebrow": "Beloningen die kloppen",
+    "title": "Munten verdienen, geen rookgordijn.",
+    "lead": "We laten kinderen vooruitgang voelen — maar zonder oneindige badge-streams die alleen verslavend zijn. Wat je kind verdient, kan het ook ergens aan uitgeven.",
+    "phases": [
+      { "step": "Stap 1", "title": "Oefenen verdient munten", "body": "Geen punten voor opklikken. Munten alleen voor goed doordachte antwoorden — meer voor moeilijkere vragen." },
+      { "step": "Stap 2", "title": "Avatar groeit mee", "body": "Onderdelen ontgrendelen, niet kopen met echt geld. Geen lootboxes, geen FOMO." },
+      { "step": "Stap 3", "title": "Echte goodies", "body": "Kinderen kunnen munten inwisselen voor stickers, posters of een boekje — opgestuurd naar huis." }
+    ],
+    "unlockLabel": "+ hoed",
+    "barLabelPrefix": "+",
+    "goodies": [
+      { "label": "Sticker-set", "cost": "200m" },
+      { "label": "Poster",      "cost": "600m" },
+      { "label": "Werkboekje",  "cost": "1200m" }
+    ]
+  },
+  "finalCta": {
+    "title": "14 dagen gratis. Daarna €11,95 — of niets.",
+    "sub": "Twee minuten registratie. Geen creditcard. Stop wanneer je wilt.",
+    "ctaTrial": "Start gratis proef",
+    "ctaTry": "Probeer een vraag"
+  },
+  "samenModus": {
+    "eyebrow": "Nieuw — Samen-modus",
+    "title": "Een kwartier samen leren. Geen huiswerkgevecht.",
+    "lead": "Open Samen-modus en jullie spelen een ronde samen — Lexi op de tablet van je kind, een kleine hint-kaart op jouw telefoon. Jij hoeft niet te weten wat een 'kommagetal' is. Lexi vertelt het.",
+    "steps": {
+      "one":   { "eyebrow": "01", "title": "Hint zonder spoiler",          "body": "Jij ziet hoe je kunt helpen. Niet wát het antwoord is." },
+      "two":   { "eyebrow": "02", "title": "Eén gespreksstarter per week", "body": "Concrete vragen om aan tafel te bespreken — geen rapportage." },
+      "three": { "eyebrow": "03", "title": "Geen schermtijd erbij",        "body": "Samen-modus duurt zo lang als jullie samen willen. Klaar is klaar." }
+    },
+    "scene": {
+      "parentLabel": "Op je telefoon",
+      "parentHint": "Hint voor jou: leg uit dat een kwart een halve helft is.",
+      "kidLabel": "Op de tablet",
+      "kidQuestion": "Welk getal hoort hier?",
+      "kidOptions": ["1/2", "1/4", "1/3", "3/4"]
+    }
+  },
+  "progressChart": {
+    "eyebrow": "Voor jou",
+    "title": "Je kind in beeld op zondagavond.",
+    "lead": "Geen schoolportaal-look. Eén kaart per week, met wat ze deden en één gespreksstarter.",
+    "reportLabel": "Weekrapport — week 12",
+    "kidName": "Sara",
+    "stats": {
+      "minutes": { "label": "Geoefend", "value": "47 min" },
+      "streak": { "label": "Streak", "value": "12 dagen" },
+      "levels": { "label": "Niveaus omhoog", "value": "2" }
+    },
+    "rows": [
+      { "label": "Rekenen — tafels",     "topic": "Tafel van 7, 8", "pct": 78 },
+      { "label": "Taal — werkwoorden",   "topic": "Stam + t / d",   "pct": 64 },
+      { "label": "Lezen — begrijpend",   "topic": "Hoofdgedachte",  "pct": 71 },
+      { "label": "Wereld — geschiedenis","topic": "Romeinen",       "pct": 55 }
+    ],
+    "viewAll": "Bekijk het volledige dashboard →"
+  },
+  "subjects": {
+    "eyebrow": "Vakken",
+    "title": "Alles wat op school aan bod komt.",
+    "lead": "Afgestemd op de Nederlandse SEO leerlijn. Van kleuterklas tot groep 8.",
+    "items": {
+      "rekenen": { "title": "Rekenen", "body": "Tafels, breuken, verhaaltjessommen — gepacificeerd in stappen." },
+      "taal":    { "title": "Taal", "body": "Woordenschat, spelling, grammatica zonder droge invuloefeningen." },
+      "lezen":   { "title": "Lezen", "body": "Begrijpend lezen met korte teksten en open vragen." },
+      "wereld":  { "title": "Wereldoriëntatie", "body": "Aardrijkskunde, geschiedenis, natuur — verkennend." },
+      "engels":  { "title": "Engels", "body": "Vanaf groep 7 in NL, vanaf leerjaar 5 in BE." }
+    }
+  },
+  "seoProof": {
+    "eyebrow": "SEO leerlijn 2026",
+    "title": "Je kind oefent precies wat de juf volgende week toetst.",
+    "lead": "Elke vraag bij Lexi is gekoppeld aan een leerdoel uit de SEO leerlijn. Dezelfde leerdoelen die op het rapport staan — zo zie je in één oogopslag waar je kind staat ten opzichte van wat school verwacht.",
+    "bullets": [
+      "Eén-op-één gekoppeld aan rapportonderdelen",
+      "Per leerdoel zichtbaar wat goed gaat",
+      "Beoordeeld door leerkrachten uit het basisonderwijs"
+    ],
+    "report": {
+      "kicker": "Rapport · groep 5, periode 2",
+      "kid":    "Sara · Rekenen",
+      "status": "Op koers"
+    },
+    "rows": [
+      { "code": "REK-5.1", "label": "Decimale getallen lezen", "pct": 92,  "tone": "ok" },
+      { "code": "REK-5.2", "label": "Kommagetallen optellen",  "pct": 78,  "tone": "primary" },
+      { "code": "REK-5.3", "label": "Breuken vergelijken",     "pct": 100, "tone": "ok" },
+      { "code": "REK-5.4", "label": "Breuken optellen",        "pct": 42,  "tone": "sun" },
+      { "code": "REK-5.5", "label": "Verhoudingstabel",        "pct": 18,  "tone": "muted" }
+    ]
+  },
+  "trust": {
+    "eyebrow": "In beta — sinds januari 2026",
+    "title": "Ervaringen van de eerste Nederlandse gezinnen.",
+    "lead": "Echte testimonials komen zodra we genoeg verhalen hebben. Onderstaande citaten zijn voorlopig.",
+    "testimonials": [
+      { "quote": "Mijn dochter zat er deze week vrijwilig elke dag voor. Dat zegt genoeg.", "author": "Marieke", "context": "Moeder van Liv (groep 5)" },
+      { "quote": "De gespreksstarter aan tafel werkt verrassend goed.", "author": "Joris", "context": "Vader van Tijn (groep 7)" },
+      { "quote": "Eindelijk iets digitaals dat niet aanvoelt als saaie schoolwerk.", "author": "Anouk", "context": "Moeder van Sara (leerjaar 4)" }
+    ]
+  },
+  "pricing": {
+    "eyebrow": "Prijs",
+    "title": "Eén prijs, het hele gezin.",
+    "lead": "Geen losse abonnementen per kind. Geen jaarcontract. Per maand opzegbaar — echt.",
+    "ctaTrial": "Start 14 dagen gratis",
+    "tiers": {
+      "monthly":  { "name": "Maandelijks", "price": "€11,95", "interval": "per maand", "features": ["Alle kinderen in het gezin", "Alle vakken", "Voortgangsdashboard", "Per maand opzegbaar"], "badge": "" },
+      "yearly":   { "name": "Jaarlijks",   "price": "€119",   "interval": "per jaar",  "features": ["Alle kinderen in het gezin", "Alle vakken", "Voortgangsdashboard", "2 maanden gratis"], "badge": "Voordeligst" }
+    }
+  },
+  "faq": {
+    "eyebrow": "Veelgestelde vragen",
+    "title": "Wat ouders ons vragen.",
+    "items": [
+      { "q": "Wat kost het precies?",                            "a": "€11,95 per maand voor alle kinderen in het gezin samen, of €119 per jaar (twee maanden voordeel). Eerste 14 dagen gratis, daarna per maand opzegbaar." },
+      { "q": "Voor welke leeftijd is Lexi?",                     "a": "Voor kinderen van 4 tot 12 jaar — groep 1 tot en met groep 8." },
+      { "q": "Hoe werkt het samen oefenen?",                     "a": "In Samen-modus speelt je kind op tablet of computer; jij krijgt op je telefoon korte hint-kaarten. Geen rapport, geen controle — gewoon hulp wanneer je kind het vraagt. Je hoeft de stof niet te kennen." },
+      { "q": "Hoe weet Lexi wat moeilijk is voor mijn kind?",    "a": "Na elke vraag past Lexi het niveau aan. Verkeerd antwoord? Volgende vraag een treetje makkelijker. Drie keer goed achter elkaar? Een treetje moeilijker. Zo blijft oefenen passend en frustratie weg." },
+      { "q": "Wie maakt de vragen?",                             "a": "Leerkrachten uit het basisonderwijs. Elke vraag wordt door minstens één andere docent gereviewd voordat hij in de app verschijnt." },
+      { "q": "Wat met privacy?",                                 "a": "We verzamelen alleen wat nodig is voor het leerproces. Geen advertenties, geen doorverkoop. AVG-conform, data staat in Nederland. Ouders kunnen alle data inzien of verwijderen." },
+      { "q": "Werkt het ook offline?",                           "a": "Een dagdeel oefenen kan offline (de app cached vragen). Voor het Samen-modus hint-kanaal is wel internet nodig." }
+    ]
+  },
+  "signup": {
+    "title": "Aanmelden",
+    "benefits": {
+      "title": "14 dagen gratis proberen",
+      "sub": "Daarna €11,95 per maand voor het hele gezin. Per maand opzegbaar.",
+      "items": ["Adaptieve oefeningen", "Alle vakken inbegrepen", "Ouder-dashboard", "Geen advertenties"]
+    },
+    "steps": [
+      { "label": "Account",    "title": "Maak je ouder-account",       "sub": "Zo kun je de voortgang van je kind volgen." },
+      { "label": "Je kind",    "title": "Vertel ons over je kind",     "sub": "We passen Lexi aan op het niveau." },
+      { "label": "Vakken",     "title": "Welke vakken wil je volgen?", "sub": "Vink uit wat niet hoeft. Je kan dit later aanpassen." },
+      { "label": "Abonnement", "title": "Kies een abonnement",         "sub": "14 dagen gratis. Daarna afgeschreven, opzegbaar per maand." }
+    ],
+    "actions": { "back": "Vorige", "cancel": "Annuleren", "next": "Volgende", "finish": "Voltooien" },
+    "account": {
+      "fields": {
+        "name":     { "label": "Jouw naam",   "placeholder": "Marieke de Vries" },
+        "email":    { "label": "E-mailadres", "placeholder": "marieke@voorbeeld.nl" },
+        "password": { "label": "Wachtwoord",  "placeholder": "Minimaal 8 tekens" }
+      }
+    },
+    "kid": {
+      "fields": {
+        "name":  { "label": "Naam van je kind", "placeholder": "Liv" },
+        "year":  { "label": "Geboortejaar" },
+        "groep": { "label": "Groep" }
+      }
+    },
+    "subjects": {
+      "items": {
+        "rekenen": "Rekenen",
+        "taal":    "Taal",
+        "lezen":   "Lezen",
+        "wereld":  "Wereldoriëntatie",
+        "engels":  "Engels"
+      }
+    },
+    "subscription": {
+      "tiers": {
+        "monthly": { "name": "Maandelijks", "price": "€11,95", "interval": "per maand", "body": "Per maand opzegbaar." },
+        "yearly":  { "name": "Jaarlijks",   "price": "€119",   "interval": "per jaar",  "body": "2 maanden gratis." }
+      },
+      "badge": "Voordeligst"
+    },
+    "welcome": {
+      "title": "Welkom bij Lexi.kids!",
+      "sub":   "Je account is aangemaakt. Open je dashboard om te beginnen.",
+      "cta":   "Open je dashboard"
+    }
+  },
+  "admin": {
+    "title": "Admin · Content",
+    "breadcrumb": "Admin · Content",
+    "quizzen": {
+      "title": "Quizzen & toetsen",
+      "viewAsKid": "Bekijk als kind →",
+      "newQuiz": "+ Nieuwe quiz",
+      "edit": "Bewerk",
+      "columns": {
+        "title":    "Quiz",
+        "subject":  "Vak",
+        "groep":    "Groep",
+        "gameType": "Speeltype",
+        "questions": "Vragen",
+        "status":   "Status"
+      },
+      "status": {
+        "live":    "Live",
+        "concept": "Concept"
+      }
+    }
+  },
+  "shop": {
+    "title": "Shop",
+    "breadcrumb": "Shop · Bundels & Abonnementen",
+    "heading": {
+      "title": "Boeken en digitaal oefenen voor groep 1 t/m 8",
+      "lead": "Combineer fysieke werkboeken met een abonnement op Lexi — kinderen leren beter als ze afwisselen tussen scherm en schrift."
+    },
+    "filters": {
+      "category": {
+        "label": "Categorie",
+        "all": "Alles",
+        "abonnementen": "Abonnementen",
+        "werkboeken": "Werkboeken",
+        "bundels": "Bundels"
+      },
+      "groep": {
+        "label": "Groep",
+        "all": "Alle"
+      }
+    },
+    "sections": {
+      "abonnementen": "Abonnementen",
+      "bundels":      "Bundels",
+      "werkboeken":   "Werkboeken"
+    },
+    "card": {
+      "addToCart":  "In winkelmandje",
+      "choosePlan": "Sluit af",
+      "groepLabel": "Groep"
+    },
+    "cart": {
+      "label": "Winkelmandje",
+      "empty": "0 items · €0,00"
+    }
+  },
+  "kid": {
+    "title": "Lexi.kids",
+    "header": {
+      "coins": "munten",
+      "avatar": "Avatar",
+      "adminLink": "Admin"
+    },
+    "greeting": {
+      "kicker": "Hoi Sara!",
+      "title": "Klaar voor de quiz van vandaag?",
+      "sub": "Verdien munten met goed antwoorden.",
+      "cta": "Start"
+    },
+    "mijnVakken": { "title": "Mijn vakken" },
+    "quizzen":    { "title": "Quizzen voor jou", "subtitle": "elke quiz heeft z'n eigen spel" },
+    "quizCard":   { "start": "Start", "durationLabel": "min", "questionsLabel": "vragen", "newBadge": "nieuw" },
+    "gameType": {
+      "mc":         "Multiple choice",
+      "type":       "Intypen",
+      "match":      "Match-paren",
+      "drag-order": "Slepen & sorteren",
+      "catapult":   "Katapult"
+    },
+    "subjects": {
+      "rekenen": "Rekenen",
+      "taal":    "Taal",
+      "lezen":   "Lezen",
+      "engels":  "Engels",
+      "wereld":  "Wereld"
+    },
+    "speltypes": {
+      "title": "Speltypes",
+      "subtitle": "tik om te proberen",
+      "items": {
+        "mc":         { "name": "Multiple choice", "desc": "4 opties, instant feedback" },
+        "type":       { "name": "Intypen",         "desc": "Open antwoord, spelling-tolerant" },
+        "catapult":   { "name": "Katapult",        "desc": "Schiet op het juiste antwoord" },
+        "match":      { "name": "Match-paren",     "desc": "Sleep paren bij elkaar" },
+        "drag-order": { "name": "Sorteer",         "desc": "Zet in juiste volgorde" }
+      }
+    }
+  },
+  "ouder": {
+    "title": "Voor jou",
+    "kicker": "Weekrapport",
+    "greeting": "Goedemiddag, {name} — dit is jullie week.",
+    "kidsLabel": "Jullie kinderen",
+    "manageSection": {
+      "title": "Abonnement",
+      "body": "Maandelijks · €11,95. Volgende incasso 1 juni 2026.",
+      "cta": "Beheer abonnement"
+    },
+    "starter": {
+      "kicker": "Gespreksstarter",
+      "title": "Voor aan tafel",
+      "body": "\"Sara, wat is een breuk eigenlijk? Kun je het me uitleggen met een pizza?\" — ze heeft hier deze week veel mee geoefend en is er trots op."
+    }
+  },
+  "probeer": {
+    "title": "Probeer een vraag",
+    "kicker": "Voorbeeld · zonder account",
+    "intro": "Een echte Lexi-vraag in 30 seconden. Je hoeft niets in te vullen.",
+    "subject": "Rekenen · groep 5",
+    "question": "Welk getal hoort hier?",
+    "options": ["1/2", "1/4", "1/3", "3/4"],
+    "correctIdx": 3,
+    "feedbackOk": "Goed! Lexi onthoudt dit en past de volgende vraag aan.",
+    "feedbackTry": "Tik op het antwoord dat je denkt.",
+    "rewardTitle": "+12 munten · Goed bezig!",
+    "rewardSub": "Nieuw avatar-onderdeel ontgrendeld.",
+    "again": "Probeer opnieuw",
+    "ctaSignup": "Start 14 dagen gratis"
+  }
+}

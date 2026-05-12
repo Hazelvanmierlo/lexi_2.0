@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Surfaces */
+  --color-bg: oklch(99% 0.005 95);
+  --color-bg-2: oklch(96% 0.018 85);
+  --color-card: #ffffff;
+
+  /* Ink (text) */
+  --color-ink: oklch(22% 0.025 260);
+  --color-ink-2: oklch(40% 0.02 260);
+  --color-ink-3: oklch(55% 0.015 260);
+
+  /* Lines */
+  --color-line: oklch(90% 0.012 260);
+  --color-line-2: oklch(94% 0.01 260);
+
+  /* Brand — coral (default; swap accent variant by editing these three).
+     Lightness held at 57% so white-on-primary CTAs clear WCAG AA 4.5:1
+     (measured 4.80:1; 60% lands at 4.24:1 and fails). */
+  --color-primary: oklch(57% 0.16 35);
+  --color-primary-ink: oklch(38% 0.15 35);
+  --color-primary-soft: oklch(94% 0.04 35);
+
+  /* Subject palette */
+  --color-teal: oklch(68% 0.12 185);
+  --color-teal-soft: oklch(94% 0.035 185);
+  --color-sun: oklch(85% 0.15 95);
+  --color-sun-soft: oklch(96% 0.05 95);
+  --color-plum: oklch(55% 0.14 305);
+  --color-plum-soft: oklch(95% 0.03 305);
+  --color-ok: oklch(58% 0.14 155);
+  --color-ok-soft: oklch(94% 0.04 155);
+
+  /* Geometry */
+  --radius-lexi: 14px;
+  --radius-lexi-lg: 22px;
+
+  /* Shadows — warm undertone */
+  --shadow-lexi-sm: 0 1px 2px rgba(20,20,40,0.04), 0 1px 1px rgba(20,20,40,0.03);
+  --shadow-lexi: 0 8px 28px -12px rgba(40,20,10,0.12), 0 2px 6px rgba(40,20,10,0.04);
+  --shadow-lexi-lg: 0 30px 60px -30px rgba(40,20,10,0.22), 0 12px 20px -12px rgba(40,20,10,0.08);
+
+  /* Fonts (variables set in layout.tsx) */
+  --font-display: var(--font-display-google), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-google), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-google), ui-monospace, SFMono-Regular, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Accent variants documented for the future Tweaks panel — not wired yet.
+   To swap the default coral, replace --color-primary, --color-primary-ink,
+   --color-primary-soft above with one of these triples:
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+   coral (default): oklch(66% 0.17 35) / oklch(38% 0.15 35) / oklch(94% 0.04 35)
+   teal           : oklch(62% 0.15 185) / oklch(34% 0.12 185) / oklch(94% 0.035 185)
+   plum           : oklch(55% 0.18 305) / oklch(35% 0.14 305) / oklch(95% 0.03 305)
+   forest         : oklch(55% 0.14 145) / oklch(32% 0.12 145) / oklch(94% 0.04 145)
+*/
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+@import "./_landing.css";

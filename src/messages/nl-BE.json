@@ -1,0 +1,47 @@
+{
+  "common": {
+    "company": "Lexi.kids — Antwerpen",
+    "groep": "leerjaar",
+    "groepRange": "1 t/m 6",
+    "curriculum": "ZILL"
+  },
+  "footer": {
+    "tagline": "Slim oefenen voor leerjaar 1 t/m 6."
+  },
+  "hero": {
+    "kicker": "Voor ouders in België",
+    "title": "Het oefenprogramma waar je kind zelf om vraagt."
+  },
+  "samenModus": {
+    "scene": {
+      "kidQuestion": "Welk getal hoort hier?"
+    }
+  },
+  "progressChart": {
+    "rows": [
+      { "label": "Rekenen — tafels",     "topic": "Tafel van 7, 8", "pct": 78 },
+      { "label": "Taal — werkwoorden",   "topic": "Stam + t / d",   "pct": 64 },
+      { "label": "Lezen — begrijpend",   "topic": "Hoofdgedachte",  "pct": 71 },
+      { "label": "Wereld — geschiedenis","topic": "Romeinen",       "pct": 55 }
+    ]
+  },
+  "seoProof": {
+    "title": "Jouw kind oefent precies wat de juf of meester volgende week toetst.",
+    "lead": "Lexi volgt het ZILL-leerplan — dezelfde leerdoelen die ook op school worden getoetst.",
+    "footnote": "Percentages tonen voltooid van het thema voor leerjaar 4."
+  },
+  "trust": {
+    "testimonials": [
+      { "quote": "Mijn dochter zat er deze week vrijwilig elke dag voor. Dat zegt genoeg.", "author": "Marieke", "context": "Moeder van Liv (leerjaar 3)" },
+      { "quote": "De gespreksstarter aan tafel werkt verrassend goed.", "author": "Joris", "context": "Vader van Tijn (leerjaar 5)" },
+      { "quote": "Eindelijk iets digitaals dat niet aanvoelt als saaie schoolwerk.", "author": "Anouk", "context": "Moeder van Sara (leerjaar 4)" }
+    ]
+  },
+  "signup": {
+    "kid": {
+      "fields": {
+        "groep": { "label": "Leerjaar" }
+      }
+    }
+  }
+}

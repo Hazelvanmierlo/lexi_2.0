@@ -1,0 +1,274 @@
+// Lexi.kids — Postgres + Prisma schema
+//
+// Spec: design_handoff/README.md §10
+// Additions beyond §10 (kept lean): KidConsent (GDPR), AuditLog (admin trail),
+// WorkbookSku / BundleSku (shop catalogue), Tier defaults, indexes.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Prisma 7: connection URL is defined in prisma.config.ts, not here.
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── enums ─────────────────────────────────────────────────────────────────
+
+enum Region {
+  NL
+  BE
+}
+
+enum Tier {
+  MONTHLY
+  YEARLY
+  FAMILY
+}
+
+enum Subject {
+  REKENEN
+  TAAL
+  LEZEN
+  WERELD
+  ENGELS
+}
+
+enum GameType {
+  MC
+  TYPE
+  CATAPULT
+  MATCH
+  DRAG_ORDER
+}
+
+enum QuizStatus {
+  CONCEPT
+  LIVE
+}
+
+enum ParentRole {
+  PARENT
+  ADMIN
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+// ─── household + people ────────────────────────────────────────────────────
+
+model Household {
+  id                 String              @id @default(cuid())
+  ownerEmail         String              @unique
+  region             Region              @default(NL)
+  stripeCustomerId   String?             @unique
+  subscriptionTier   Tier?
+  subscriptionStatus SubscriptionStatus?
+  trialEndsAt        DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  parents            Parent[]
+  kids               Kid[]
+  orders             ShopOrder[]
+}
+
+model Parent {
+  id           String     @id @default(cuid())
+  householdId  String
+  household    Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  clerkUserId  String     @unique
+  email        String     @unique
+  role         ParentRole @default(PARENT)
+  createdAt    DateTime   @default(now())
+
+  @@index([householdId])
+}
+
+model Kid {
+  id          String           @id @default(cuid())
+  householdId String
+  household   Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name        String
+  groep       Int // 1..8 (NL) or 1..6 (BE)
+  avatar      Json             @default("{}")
+  coins       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  sessions    Session[]
+  consent     KidConsent?
+  mastery     MasteryRecord[]
+
+  @@index([householdId])
+}
+
+// Per-kid × per-subject mastery, updated via EWMA after each completed session.
+// Score is in [0,1]; multiply by 100 to display as a percentage.
+//
+// Future: add an optional `topic` column for finer granularity once questions
+// carry a topic tag in their payload.
+model MasteryRecord {
+  id            String   @id @default(cuid())
+  kidId         String
+  kid           Kid      @relation(fields: [kidId], references: [id], onDelete: Cascade)
+  subject       Subject
+  score         Float    @default(0.5)
+  sessionsCount Int      @default(0)
+  lastSeenAt    DateTime @default(now())
+
+  @@unique([kidId, subject])
+  @@index([kidId])
+}
+
+// GDPR — verified parental consent at kid-profile creation.
+model KidConsent {
+  id          String   @id @default(cuid())
+  kidId       String   @unique
+  kid         Kid      @relation(fields: [kidId], references: [id], onDelete: Cascade)
+  parentEmail String
+  consentedAt DateTime @default(now())
+  ipAddress   String
+  userAgent   String
+}
+
+// ─── content ───────────────────────────────────────────────────────────────
+
+model Quiz {
+  id            String     @id @default(cuid())
+  title         String
+  subject       Subject
+  groep         Int
+  region        Region     @default(NL)
+  gameType      GameType
+  customExplain String     @default("") // uitleg-scherm copy
+  status        QuizStatus @default(CONCEPT)
+  publishedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  questions     Question[]
+  sessions      Session[]
+
+  @@index([status, region, subject, groep])
+}
+
+// Question.payload is a discriminated JSON shape — validated by Zod in
+// src/lib/quiz-schemas.ts, NOT at the DB level. The shape depends on the
+// parent Quiz.gameType (see §8 of the handoff README).
+model Question {
+  id      String @id @default(cuid())
+  quizId  String
+  quiz    Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  order   Int
+  payload Json
+
+  @@unique([quizId, order])
+}
+
+// ─── play ──────────────────────────────────────────────────────────────────
+
+model Session {
+  id           String        @id @default(cuid())
+  kidId        String
+  kid          Kid           @relation(fields: [kidId], references: [id], onDelete: Cascade)
+  quizId       String
+  quiz         Quiz          @relation(fields: [quizId], references: [id])
+  status       SessionStatus @default(IN_PROGRESS)
+  startedAt    DateTime      @default(now())
+  finishedAt   DateTime?
+  correctCount Int           @default(0)
+  coinsEarned  Int           @default(0)
+  perQuestion  Json          @default("[]") // [{ questionId, correct, msSpent, coinsAwarded }]
+
+  @@index([kidId, startedAt])
+  @@index([quizId, startedAt])
+}
+
+// ─── shop ──────────────────────────────────────────────────────────────────
+
+model WorkbookSku {
+  id            String   @id @default(cuid())
+  title         String
+  subject       Subject
+  groepBucket   String // "1-2" | "3-4" | "5-6" | "7-8"
+  priceCents    Int
+  stripePriceId String?  @unique
+  coverSymbol   String // "A" | "∑" | "EN" | "½" | "◐" | "✎" | "×" | "L" | "W"
+  tint          String // Tailwind class fragment, e.g. "bg-primary-soft"
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@index([groepBucket, subject])
+}
+
+model BundleSku {
+  id            String   @id @default(cuid())
+  title         String
+  groepBucket   String
+  priceCents    Int
+  originalCents Int
+  stripePriceId String?  @unique
+  body          String
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model SubscriptionSku {
+  id            String   @id @default(cuid())
+  tier          Tier     @unique
+  title         String
+  priceCents    Int
+  intervalLabel String // "per maand" | "per jaar"
+  body          String
+  badge         String // "POPULAIR" | "VOORDELIG" | "GEZIN"
+  stripePriceId String?  @unique
+}
+
+model ShopOrder {
+  id              String    @id @default(cuid())
+  householdId     String
+  household       Household @relation(fields: [householdId], references: [id])
+  stripeSessionId String    @unique
+  items           Json // [{ sku, qty, priceCents, name }]
+  totalCents      Int
+  status          String // "pending" | "paid" | "fulfilled" | "refunded"
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([householdId, createdAt])
+}
+
+// ─── ops ───────────────────────────────────────────────────────────────────
+
+// Stripe + future webhook idempotency. Keyed on the provider event id.
+model ProcessedEvent {
+  id          String   @id // e.g. Stripe event.id
+  source      String // "stripe" | ...
+  processedAt DateTime @default(now())
+
+  @@index([source, processedAt])
+}
+
+// Admin audit trail — quiz CRUD, role changes, manual coin grants, etc.
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String // Clerk userId of the parent/admin who did it
+  action      String // "quiz.publish" | "quiz.update" | ...
+  targetType  String // "Quiz" | "Kid" | "Household" | ...
+  targetId    String
+  diff        Json     @default("{}")
+  at          DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorUserId, at])
+}

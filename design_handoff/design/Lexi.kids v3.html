@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lexi.kids v3 — Adaptief leren voor groep 1 t/m 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: oklch(98% 0.012 85);
+    --bg-2: oklch(96% 0.018 85);
+    --card: #ffffff;
+    --ink: oklch(22% 0.025 260);
+    --ink-2: oklch(40% 0.02 260);
+    --ink-3: oklch(60% 0.015 260);
+    --line: oklch(90% 0.012 260);
+    --line-2: oklch(94% 0.01 260);
+    --primary: oklch(66% 0.17 35);
+    --primary-ink: oklch(38% 0.15 35);
+    --primary-soft: oklch(94% 0.04 35);
+    --teal: oklch(68% 0.12 185);
+    --teal-soft: oklch(94% 0.035 185);
+    --sun: oklch(85% 0.15 95);
+    --sun-soft: oklch(96% 0.05 95);
+    --plum: oklch(55% 0.14 305);
+    --plum-soft: oklch(95% 0.03 305);
+    --ok: oklch(60% 0.14 155);
+    --ok-soft: oklch(94% 0.04 155);
+    --radius: 14px;
+    --radius-lg: 22px;
+    --shadow-sm: 0 1px 2px rgba(20,20,40,0.04), 0 1px 1px rgba(20,20,40,0.03);
+    --shadow: 0 8px 28px -12px rgba(40,20,10,0.12), 0 2px 6px rgba(40,20,10,0.04);
+    --shadow-lg: 0 30px 60px -30px rgba(40,20,10,0.22), 0 12px 20px -12px rgba(40,20,10,0.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family: 'Geist', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .display, h1, h2, h3 { font-family: 'Bricolage Grotesque', serif; letter-spacing: -0.02em; font-weight: 600; text-wrap: balance; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+  img { max-width: 100%; display: block; }
+
+  /* App mount */
+  #root { min-height: 100vh; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "lexiStyle": "bot",
+      "accent": "coral",
+      "region": "NL",
+      "heroVariant": "samen",
+      "showPriceInHero": true,
+      "showSamenModus": true
+    }/*EDITMODE-END*/;
+  </script>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="src/Lexi.jsx"></script>
+  <script type="text/babel" src="src/v3/Nav.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/Landing.v3.jsx"></script>
+  <script type="text/babel" src="src/Signup.jsx"></script>
+  <script type="text/babel" src="src/Dashboard.jsx"></script>
+  <script type="text/babel" src="src/Question.jsx"></script>
+  <script type="text/babel" src="src/Game.jsx"></script>
+  <script type="text/babel" src="src/v3/Games.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/GameQuestions.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/GameShell.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/KidHome.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/AdminQuiz.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/Shop.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/Tweaks.v3.jsx"></script>
+  <script type="text/babel" src="src/v3/App.v3.jsx"></script>
+</body>
+</html>

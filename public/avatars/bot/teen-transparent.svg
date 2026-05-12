@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+    <ellipse cx="512" cy="844" rx="304" ry="38.4" fill="rgba(40,20,10,0.12)"/>
+    <line x1="512" y1="268" x2="512" y2="162.40000000000003" stroke="oklch(22% 0.025 260)" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="512" cy="140" r="32" fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <rect x="240" y="268" width="544" height="512" rx="96"
+      fill="oklch(55% 0.14 305)" stroke="oklch(22% 0.025 260)" stroke-width="8"/>
+    <rect x="313.6" y="396" width="396.8" height="176" rx="57.599999999999994"
+      fill="oklch(95% 0.04 60)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <rect x="416" y="476" width="51.2" height="70.4" rx="19.2" fill="oklch(22% 0.025 260)"/>
+    <rect x="556.8" y="476" width="51.2" height="70.4" rx="19.2" fill="oklch(22% 0.025 260)"/>
+    <path d="M460.8 610.4 L563.2 610.4" fill="none" stroke="oklch(22% 0.025 260)" stroke-width="6" stroke-linecap="round"/>
+    <rect x="384" y="789.6" width="256" height="64" rx="25.6"
+      fill="oklch(55% 0.14 305)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <rect x="128" y="540" width="115.19999999999999" height="57.599999999999994" rx="25.6"
+      fill="oklch(55% 0.14 305)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <circle cx="121.60000000000002" cy="568.8" r="41.6" fill="oklch(66% 0.17 35)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <g transform="translate(784, 316)">
+      <path d="M0 -16 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="3" stroke-linejoin="round"/>
+    </g><g stroke="oklch(22% 0.025 260)" stroke-width="5" fill="none">
+      <circle cx="409.6" cy="524" r="70.4" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="614.4" cy="524" r="70.4" fill="rgba(255,255,255,0.4)"/>
+      <line x1="480" y1="524" x2="544" y2="524"/>
+    </g>
+  </svg>

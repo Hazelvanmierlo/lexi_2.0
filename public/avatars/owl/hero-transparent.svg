@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+    <ellipse cx="512" cy="874.4" rx="334.4" ry="42.239999999999995" fill="rgba(40,20,10,0.12)"/>
+    <ellipse cx="512" cy="557.6" rx="323.84000000000003" ry="352" fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="8"/>
+    <ellipse cx="512" cy="617.44" rx="193.60000000000002" ry="193.60000000000002" fill="oklch(95% 0.04 60)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <path d="M237.44 311.2 L318.4 188 L399.36 311.2 Z"
+      fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M624.64 311.2 L705.6 188 L786.56 311.2 Z"
+      fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="6" stroke-linejoin="round"/>
+    <circle cx="413.44" cy="522.4" r="95.04" fill="#fff" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <circle cx="610.56" cy="522.4" r="95.04" fill="#fff" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <circle cx="413.44" cy="522.4" r="35.2" fill="oklch(22% 0.025 260)"/>
+       <circle cx="610.56" cy="522.4" r="35.2" fill="oklch(22% 0.025 260)"/>
+       <circle cx="424" cy="508.32" r="10.559999999999999" fill="#fff"/>
+       <circle cx="621.12" cy="508.32" r="10.559999999999999" fill="#fff"/>
+    <path d="M476.8 610.4 L512 680.8 L547.2 610.4 Z"
+      fill="oklch(66% 0.17 35)" stroke="oklch(22% 0.025 260)" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="177.60000000000002" cy="645.6" rx="70.4" ry="112.64" fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <g transform="translate(811.2, 293.6)">
+      <path d="M0 -16 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="3" stroke-linejoin="round"/>
+    </g><g stroke="oklch(22% 0.025 260)" stroke-width="5" fill="none">
+      <circle cx="399.36" cy="522.4" r="77.44" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="624.64" cy="522.4" r="77.44" fill="rgba(255,255,255,0.4)"/>
+      <line x1="476.8" y1="522.4" x2="547.2" y2="522.4"/>
+    </g><g>
+      <path d="M318.4 258.4
+               L318.4 152.79999999999998
+               L406.4 233.76
+               L494.4 107.03999999999998
+               L582.4 233.76
+               L670.4 152.79999999999998
+               L670.4 258.4 Z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="406.4" cy="184.48" r="6" fill="oklch(66% 0.17 35)" stroke="oklch(22% 0.025 260)" stroke-width="2"/>
+      <circle cx="582.4" cy="184.48" r="6" fill="oklch(55% 0.14 305)" stroke="oklch(22% 0.025 260)" stroke-width="2"/>
+    </g>
+      <path d="M142.39999999999998 389.2 L145.39999999999998 396.2 L152.39999999999998 399.2 L145.39999999999998 402.2 L142.39999999999998 409.2 L139.39999999999998 402.2 L132.39999999999998 399.2 L139.39999999999998 396.2 Z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="2"/>
+    
+      <path d="M899.2 598.4 L902.8000000000001 606.8 L911.2 610.4 L902.8000000000001 614 L899.2 622.4 L895.6 614 L887.2 610.4 L895.6 606.8 Z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="2"/>
+    
+      <path d="M195.2 813.6 L197.6 819.2 L203.2 821.6 L197.6 824 L195.2 829.6 L192.79999999999998 824 L187.2 821.6 L192.79999999999998 819.2 Z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="2"/>
+    
+      <path d="M846.4 196.60000000000002 L849.1 202.90000000000003 L855.4 205.60000000000002 L849.1 208.3 L846.4 214.60000000000002 L843.6999999999999 208.3 L837.4 205.60000000000002 L843.6999999999999 202.90000000000003 Z"
+        fill="oklch(85% 0.15 95)" stroke="oklch(22% 0.025 260)" stroke-width="2"/>
+    
+  </svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+    <ellipse cx="512" cy="737.6" rx="197.6" ry="24.96" fill="rgba(40,20,10,0.12)"/>
+    <ellipse cx="512" cy="550.4" rx="191.36" ry="208" fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="8"/>
+    <ellipse cx="512" cy="585.76" rx="114.4" ry="114.4" fill="oklch(95% 0.04 60)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <path d="M349.76 404.79999999999995 L397.6 332 L445.44 404.79999999999995 Z"
+      fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M578.56 404.79999999999995 L626.4 332 L674.24 404.79999999999995 Z"
+      fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="6" stroke-linejoin="round"/>
+    <circle cx="453.76" cy="529.6" r="56.160000000000004" fill="#fff" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <circle cx="570.24" cy="529.6" r="56.160000000000004" fill="#fff" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    <circle cx="453.76" cy="529.6" r="20.8" fill="oklch(22% 0.025 260)"/>
+       <circle cx="570.24" cy="529.6" r="20.8" fill="oklch(22% 0.025 260)"/>
+       <circle cx="460" cy="521.28" r="6.24" fill="#fff"/>
+       <circle cx="576.48" cy="521.28" r="6.24" fill="#fff"/>
+    <path d="M491.2 581.6 L512 623.2 L532.8 581.6 Z"
+      fill="oklch(66% 0.17 35)" stroke="oklch(22% 0.025 260)" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="314.4" cy="602.4" rx="41.6" ry="66.56" fill="oklch(68% 0.12 185)" stroke="oklch(22% 0.025 260)" stroke-width="6"/>
+    
+  </svg>
