@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { cookies } from "next/headers";
 
 const COOKIE_TTL_MS = 8 * 60 * 60 * 1000; // 8h sliding window
 export const KID_COOKIE_NAME = "lexi_pk";
@@ -35,4 +36,29 @@ export function verifyKidId(token: string, now: Date): string | null {
   if (!Number.isFinite(issuedAtMs)) return null;
   if (now.getTime() - issuedAtMs > COOKIE_TTL_MS) return null;
   return kidId;
+}
+
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: COOKIE_TTL_MS / 1000,
+};
+
+export async function setKidCookie(kidId: string, now: Date = new Date()): Promise<void> {
+  const jar = await cookies();
+  jar.set(KID_COOKIE_NAME, signKidId(kidId, now), COOKIE_OPTS);
+}
+
+export async function readKidCookie(now: Date = new Date()): Promise<string | null> {
+  const jar = await cookies();
+  const raw = jar.get(KID_COOKIE_NAME)?.value;
+  if (!raw) return null;
+  return verifyKidId(raw, now);
+}
+
+export async function clearKidCookie(): Promise<void> {
+  const jar = await cookies();
+  jar.delete(KID_COOKIE_NAME);
 }
