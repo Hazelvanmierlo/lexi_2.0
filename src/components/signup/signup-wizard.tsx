@@ -11,6 +11,7 @@ import { StepSubjects } from "./step-subjects";
 import { StepSubscription } from "./step-subscription";
 import { Welcome } from "./welcome";
 import { INITIAL_FORM, type FormState } from "./form-state";
+import { submitSignup } from "@/app/signup/actions";
 
 type Step = 1 | 2 | 3 | 4 | "welcome";
 
@@ -39,14 +40,34 @@ export function SignupWizard() {
   const idx = step - 1;
   const isLast = step === 4;
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (isLast) {
+    if (!isLast) {
+      const n = step as 1 | 2 | 3;
+      setStep((n + 1) as Step);
+      return;
+    }
+    // Final step: call the server action.
+    if (process.env.NEXT_PUBLIC_AUTH_ENABLED !== "true") {
+      // Demo path — current behaviour, no DB write.
       setStep("welcome");
       return;
     }
-    const n = step as 1 | 2 | 3;
-    setStep((n + 1) as Step);
+    const groep = parseInt(form.kidGroep, 10);
+    const result = await submitSignup({
+      email: form.email,
+      password: form.password,
+      kidName: form.kidName,
+      kidGroep: Number.isFinite(groep) ? groep : 1,
+      plan: form.plan,
+      region: "NL",
+      consent: form.consent as true,
+    });
+    if (result.ok) {
+      router.push("/kind");
+    } else {
+      alert(result.error);
+    }
   }
 
   function onBack() {

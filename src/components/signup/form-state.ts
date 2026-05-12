@@ -7,6 +7,7 @@ export type FormState = {
   kidGroep: string;
   subjects: { rekenen: boolean; taal: boolean; lezen: boolean; wereld: boolean; engels: boolean };
   plan: "monthly" | "yearly";
+  consent: boolean;
 };
 
 export const INITIAL_FORM: FormState = {
@@ -18,4 +19,5 @@ export const INITIAL_FORM: FormState = {
   kidGroep: "",
   subjects: { rekenen: true, taal: true, lezen: true, wereld: true, engels: true },
   plan: "monthly",
+  consent: false,
 };
