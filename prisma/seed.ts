@@ -4,7 +4,9 @@
 //
 // Idempotent: re-running `npm run db:seed` updates rather than duplicates.
 
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+loadEnv({ path: ".env.local" });
+loadEnv();
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { validatePayload, type GameType } from "../src/lib/quiz-schemas";
