@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Geist, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ClerkProvider } from "@clerk/nextjs";
+import { CartProvider } from "@/lib/cart-context";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -52,7 +53,7 @@ export default async function RootLayout({
           Naar inhoud
         </a>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <CartProvider>{children}</CartProvider>
         </NextIntlClientProvider>
       </body>
     </html>
