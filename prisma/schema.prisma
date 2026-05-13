@@ -83,6 +83,7 @@ model Household {
   parents            Parent[]
   kids               Kid[]
   orders             ShopOrder[]
+  uitblinkers        UitblinkerSubscription[]
 }
 
 model Parent {
@@ -111,6 +112,7 @@ model Kid {
   sessions    Session[]
   consent     KidConsent?
   mastery     MasteryRecord[]
+  uitblinker  UitblinkerSubscription?
 
   @@index([householdId])
 }
@@ -200,17 +202,24 @@ model Session {
 
 model WorkbookSku {
   id            String   @id @default(cuid())
+  slug          String   @unique
   title         String
   subject       Subject
-  groepBucket   String // "1-2" | "3-4" | "5-6" | "7-8"
+  groepBucket   String // single-digit string "1".."8" (legacy buckets like "1-2" are gone post-reseed)
   priceCents    Int
   stripePriceId String?  @unique
   coverSymbol   String // "A" | "∑" | "EN" | "½" | "◐" | "✎" | "×" | "L" | "W"
   tint          String // Tailwind class fragment, e.g. "bg-primary-soft"
+  description   String // markdown body for the detail page
+  pages         Int      @default(64)
+  isbn          String?  @unique
+  coverImageUrl String?
+  highlights    Json     @default("[]") // string[] selling bullets
   active        Boolean  @default(true)
   createdAt     DateTime @default(now())
 
   @@index([groepBucket, subject])
+  @@index([subject, groepBucket])
 }
 
 model BundleSku {
@@ -234,6 +243,28 @@ model SubscriptionSku {
   body          String
   badge         String // "POPULAIR" | "VOORDELIG" | "GEZIN"
   stripePriceId String?  @unique
+}
+
+// Adaptive monthly physical workbook delivered per kid. Each Uitblinker
+// generates a fresh book each month based on the kid's recent Lexi-app
+// answers. Shipping is per-kid (could differ — grandparents vs home).
+model UitblinkerSubscription {
+  id               String    @id @default(cuid())
+  householdId      String
+  household        Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  kidId            String    @unique
+  kid              Kid       @relation(fields: [kidId], references: [id], onDelete: Cascade)
+  subject          Subject
+  startedAt        DateTime  @default(now())
+  pausedAt         DateTime?
+  stripePriceId    String?
+  stripeSubId      String?
+  shippingName     String
+  shippingLine1    String
+  shippingPostcode String
+  shippingCity     String
+
+  @@index([householdId])
 }
 
 model ShopOrder {
