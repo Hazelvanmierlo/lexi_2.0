@@ -72,6 +72,7 @@ export type DbSessionForStats = {
 
 export type DbWorkbookSku = {
   id: string;
+  slug: string;
   title: string;
   subject: Subject;
   groepBucket: string;
@@ -79,6 +80,11 @@ export type DbWorkbookSku = {
   stripePriceId: string | null;
   coverSymbol: string;
   tint: string;
+  description: string;
+  pages: number;
+  isbn: string | null;
+  coverImageUrl: string | null;
+  highlights: unknown; // Json — string[] in practice
   active: boolean;
   createdAt: Date;
 };

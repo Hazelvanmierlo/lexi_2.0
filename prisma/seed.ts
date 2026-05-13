@@ -381,27 +381,32 @@ const BUNDLES = [
   },
 ];
 
-const WORKBOOKS = [
-  // groep 1-2
-  { id: "seed-wb-01", title: "Letters & Klanken",      subject: "TAAL",    groepBucket: "1-2", priceCents: 1295, coverSymbol: "A",  tint: "bg-teal-soft" },
-  { id: "seed-wb-02", title: "Tellen tot 20",          subject: "REKENEN", groepBucket: "1-2", priceCents: 1295, coverSymbol: "∑",  tint: "bg-primary-soft" },
-  { id: "seed-wb-03", title: "Vormen & Kleuren",       subject: "WERELD",  groepBucket: "1-2", priceCents: 1150, coverSymbol: "◐",  tint: "bg-sun-soft" },
-  // groep 3-4
-  { id: "seed-wb-04", title: "Lezen Stap 1",           subject: "LEZEN",   groepBucket: "3-4", priceCents: 1395, coverSymbol: "✎",  tint: "bg-ok-soft" },
-  { id: "seed-wb-05", title: "Tafels van 1 t/m 10",    subject: "REKENEN", groepBucket: "3-4", priceCents: 1395, coverSymbol: "×",  tint: "bg-primary-soft" },
-  { id: "seed-wb-06", title: "Spelling Basis",         subject: "TAAL",    groepBucket: "3-4", priceCents: 1395, coverSymbol: "A",  tint: "bg-teal-soft" },
-  { id: "seed-wb-07", title: "Engels: First Words",    subject: "ENGELS",  groepBucket: "3-4", priceCents: 1495, coverSymbol: "EN", tint: "bg-plum-soft" },
-  // groep 5-6
-  { id: "seed-wb-08", title: "Breuken & Kommagetallen",subject: "REKENEN", groepBucket: "5-6", priceCents: 1495, coverSymbol: "½",  tint: "bg-primary-soft" },
-  { id: "seed-wb-09", title: "Werkwoordspelling",      subject: "TAAL",    groepBucket: "5-6", priceCents: 1495, coverSymbol: "A",  tint: "bg-teal-soft" },
-  { id: "seed-wb-10", title: "Aardrijkskunde Nederland",subject: "WERELD", groepBucket: "5-6", priceCents: 1595, coverSymbol: "◐",  tint: "bg-sun-soft" },
-  { id: "seed-wb-11", title: "Begrijpend Lezen",       subject: "LEZEN",   groepBucket: "5-6", priceCents: 1495, coverSymbol: "✎",  tint: "bg-ok-soft" },
-  // groep 7-8
-  { id: "seed-wb-12", title: "Cito Voorbereiding Rekenen",subject: "REKENEN", groepBucket: "7-8", priceCents: 1795, coverSymbol: "∑", tint: "bg-primary-soft" },
-  { id: "seed-wb-13", title: "Cito Voorbereiding Taal",subject: "TAAL",    groepBucket: "7-8", priceCents: 1795, coverSymbol: "A",  tint: "bg-teal-soft" },
-  { id: "seed-wb-14", title: "Engels Grammatica",      subject: "ENGELS",  groepBucket: "7-8", priceCents: 1595, coverSymbol: "EN", tint: "bg-plum-soft" },
-  { id: "seed-wb-15", title: "Topografie Wereld",      subject: "WERELD",  groepBucket: "7-8", priceCents: 1695, coverSymbol: "◐",  tint: "bg-sun-soft" },
-] as const;
+const WORKBOOK_SUBJECTS = [
+  { key: "TAAL" as const,    label: "Taal",              symbol: "A", tint: "bg-teal-soft" },
+  { key: "REKENEN" as const, label: "Rekenen",           symbol: "∑", tint: "bg-primary-soft" },
+  { key: "LEZEN" as const,   label: "Begrijpend Lezen",  symbol: "B", tint: "bg-sun-soft" },
+];
+
+const WORKBOOK_HIGHLIGHTS = [
+  "64 pagina's oefenstof",
+  "Uitlegvideo's via QR-code bij elke opgave",
+  "Past bij Cito, IEP en ROUTE 8",
+  "Ontwikkeld door ervaren leerkrachten",
+];
+
+function workbookDescription(label: string, n: number): string {
+  return `Dit werkboek is ontwikkeld voor leerlingen in groep ${n} en sluit aan op het reguliere basisschoolprogramma. Met heldere oefeningen, korte uitleg en stap-voor-stap voorbeelden bouwt je kind zelfvertrouwen op in ${label.toLowerCase()}.
+
+Het boek behandelt de belangrijkste onderwerpen voor groep ${n}. Elke opgave heeft een QR-code naar een korte uitlegvideo, zodat een vastgelopen oefening nooit een blokkade wordt.
+
+Geschikt voor zelfstandig oefenen na schooltijd of als aanvulling op huiswerk. Past bij de Cito-, IEP- en ROUTE 8-toetsen.`;
+}
+
+function workbookIsbn(subjectKey: "TAAL" | "REKENEN" | "LEZEN", n: number): string {
+  const subjectOffset = subjectKey === "TAAL" ? 0 : subjectKey === "REKENEN" ? 100 : 200;
+  const suffix = String(218833 + n + subjectOffset).padStart(6, "0");
+  return `9789493${suffix}`;
+}
 
 async function seedShop() {
   for (const s of SUBSCRIPTION_SKUS) {
@@ -418,12 +423,28 @@ async function seedShop() {
       create: { ...b },
     });
   }
-  for (const w of WORKBOOKS) {
-    await db.workbookSku.upsert({
-      where: { id: w.id },
-      update: { ...w },
-      create: { ...w },
-    });
+  // Workbooks: replace existing rows wholesale with 24 (3 subjects × 8 groeps).
+  // The spec moves groepBucket from "1-2"/"3-4"/... to single digits "1".."8".
+  await db.workbookSku.deleteMany({});
+  for (const s of WORKBOOK_SUBJECTS) {
+    for (let n = 1; n <= 8; n++) {
+      const slug = `${s.key.toLowerCase()}-groep-${n}`;
+      await db.workbookSku.create({
+        data: {
+          slug,
+          title: `${s.label} groep ${n}`,
+          subject: s.key,
+          groepBucket: String(n),
+          priceCents: 1695,
+          coverSymbol: s.symbol,
+          tint: s.tint,
+          description: workbookDescription(s.label, n),
+          pages: 64,
+          isbn: workbookIsbn(s.key, n),
+          highlights: WORKBOOK_HIGHLIGHTS,
+        },
+      });
+    }
   }
 }
 
