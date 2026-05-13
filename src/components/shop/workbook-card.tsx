@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Check, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { BookMockup } from "./book-mockup";
+import { StockLine } from "./stock-line";
 import { useCart } from "@/lib/cart-context";
 
 type Props = {
@@ -58,6 +59,9 @@ export function WorkbookCard({
           </p>
         ) : null}
         <p className="mt-3 font-display text-lg font-bold text-ink">{price}</p>
+        <div className="mt-1">
+          <StockLine short />
+        </div>
         <button
           type="button"
           data-test="add-to-cart"
