@@ -19,6 +19,7 @@ export const McPayload = z.object({
   q: nonEmpty,
   options: z.array(nonEmpty).length(4),
   correctIdx: z.number().int().min(0).max(3),
+  hint: z.string().optional(),
 });
 export type McPayload = z.infer<typeof McPayload>;
 
@@ -28,6 +29,7 @@ export const TypePayload = z.object({
   q: nonEmpty,
   answer: nonEmpty,
   accept: z.array(nonEmpty).optional(), // additional accepted spellings
+  hint: z.string().optional(),
 });
 export type TypePayload = z.infer<typeof TypePayload>;
 
@@ -37,6 +39,7 @@ export const CatapultPayload = z.object({
   q: nonEmpty,
   options: z.array(nonEmpty).length(4),
   correctIdx: z.number().int().min(0).max(3),
+  hint: z.string().optional(),
 });
 export type CatapultPayload = z.infer<typeof CatapultPayload>;
 
@@ -45,6 +48,7 @@ export type CatapultPayload = z.infer<typeof CatapultPayload>;
 export const MatchPayload = z.object({
   q: nonEmpty,
   pairs: z.array(z.object({ l: nonEmpty, r: nonEmpty })).length(5),
+  hint: z.string().optional(),
 });
 export type MatchPayload = z.infer<typeof MatchPayload>;
 
@@ -56,6 +60,7 @@ export const DragOrderPayload = z
     q: nonEmpty,
     items: z.array(nonEmpty).min(2).max(8),
     correctOrder: z.array(nonEmpty).min(2).max(8),
+    hint: z.string().optional(),
   })
   .refine(
     (p) =>
