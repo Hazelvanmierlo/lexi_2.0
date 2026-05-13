@@ -8,7 +8,7 @@ import { WerkboekenGrid } from "@/components/shop/werkboeken-grid";
 import { CartPill } from "@/components/shop/cart-pill";
 import { TrustSignals } from "@/components/shop/trust-signals";
 import { centsToEuro } from "@/lib/mappings";
-import { applyShopFilters } from "@/lib/shop-filter";
+import { applyShopFilters, parseShopFilters } from "@/lib/shop-filter";
 import type { DbWorkbookSku } from "@/lib/db-types";
 
 export const dynamic = "force-dynamic";
@@ -16,13 +16,10 @@ export const dynamic = "force-dynamic";
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; groep?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const filters = {
-    subject: (sp.subject ?? "all").toLowerCase(),
-    groep: sp.groep ?? "all",
-  };
+  const filters = parseShopFilters(sp);
 
   const workbooks = (await db.workbookSku.findMany({
     where: { active: true },
