@@ -4,10 +4,14 @@ import { QuizTable } from "@/components/admin/quiz-table";
 import type { AdminQuiz } from "@/components/admin/quiz-row";
 import { gameTypeToUi, subjectLabel } from "@/lib/mappings";
 import type { DbQuizWithCount } from "@/lib/db-types";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminQuizzenPage() {
+  if (process.env.NEXT_PUBLIC_AUTH_ENABLED === "true") {
+    await requireAdmin();
+  }
   const rows = (await db.quiz.findMany({
     orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
     include: { _count: { select: { questions: true } } },

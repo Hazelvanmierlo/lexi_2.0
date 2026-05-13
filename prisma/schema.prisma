@@ -83,6 +83,7 @@ model Household {
   parents            Parent[]
   kids               Kid[]
   orders             ShopOrder[]
+  uitblinkers        UitblinkerSubscription[]
 }
 
 model Parent {
@@ -105,10 +106,13 @@ model Kid {
   groep       Int // 1..8 (NL) or 1..6 (BE)
   avatar      Json             @default("{}")
   coins       Int              @default(0)
+  pinHash     String? // scrypt-hashed 4-digit PIN (format: "N:salt_b64:hash_b64"); null = no PIN
+  pinSetAt    DateTime? // when the current pinHash was set
   createdAt   DateTime         @default(now())
   sessions    Session[]
   consent     KidConsent?
   mastery     MasteryRecord[]
+  uitblinker  UitblinkerSubscription?
 
   @@index([householdId])
 }
@@ -198,17 +202,25 @@ model Session {
 
 model WorkbookSku {
   id            String   @id @default(cuid())
+  slug          String   @unique
   title         String
   subject       Subject
-  groepBucket   String // "1-2" | "3-4" | "5-6" | "7-8"
+  groepBucket   String // single-digit string "1".."8" (legacy buckets like "1-2" are gone post-reseed)
   priceCents    Int
   stripePriceId String?  @unique
   coverSymbol   String // "A" | "∑" | "EN" | "½" | "◐" | "✎" | "×" | "L" | "W"
   tint          String // Tailwind class fragment, e.g. "bg-primary-soft"
+  description   String // markdown body for the detail page
+  pages         Int      @default(64)
+  isbn          String?  @unique
+  coverImageUrl String?
+  highlights    Json     @default("[]") // string[] selling bullets
   active        Boolean  @default(true)
+  sortOrder     Int      @default(0) // popularity sort; lower = more popular (seed-time heuristic)
   createdAt     DateTime @default(now())
 
   @@index([groepBucket, subject])
+  @@index([subject, groepBucket])
 }
 
 model BundleSku {
@@ -234,17 +246,48 @@ model SubscriptionSku {
   stripePriceId String?  @unique
 }
 
-model ShopOrder {
-  id              String    @id @default(cuid())
-  householdId     String
-  household       Household @relation(fields: [householdId], references: [id])
-  stripeSessionId String    @unique
-  items           Json // [{ sku, qty, priceCents, name }]
-  totalCents      Int
-  status          String // "pending" | "paid" | "fulfilled" | "refunded"
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+// Adaptive monthly physical workbook delivered per kid. Each Uitblinker
+// generates a fresh book each month based on the kid's recent Lexi-app
+// answers. Shipping is per-kid (could differ — grandparents vs home).
+model UitblinkerSubscription {
+  id               String    @id @default(cuid())
+  householdId      String
+  household        Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  kidId            String    @unique
+  kid              Kid       @relation(fields: [kidId], references: [id], onDelete: Cascade)
+  subject          Subject
+  startedAt        DateTime  @default(now())
+  pausedAt         DateTime?
+  stripePriceId    String?
+  stripeSubId      String?
+  shippingName     String
+  shippingLine1    String
+  shippingPostcode String
+  shippingCity     String
 
+  @@index([householdId])
+}
+
+model ShopOrder {
+  id               String     @id @default(cuid())
+  householdId      String?
+  household        Household? @relation(fields: [householdId], references: [id])
+  customerEmail    String
+  customerName     String
+  shippingLine1    String
+  shippingLine2    String?
+  shippingPostcode String
+  shippingCity     String
+  paymentSessionId String?    @unique // renamed from stripeSessionId
+  paymentProvider  String? // "mollie" | "paynl" | null for stub
+  items            Json // [{ kind: "workbook" | "uitblinker", ... }]
+  totalCents       Int
+  shippingCents    Int        @default(0)
+  status           String     @default("pending") // "pending" | "paid" | "fulfilled" | "refunded"
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([customerEmail, createdAt])
   @@index([householdId, createdAt])
 }
 

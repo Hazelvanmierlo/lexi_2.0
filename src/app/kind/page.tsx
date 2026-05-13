@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { KidHeader } from "@/components/kid/kid-header";
 import { DailyGreeting } from "@/components/kid/daily-greeting";
@@ -7,6 +8,7 @@ import { Speltypes } from "@/components/kid/speltypes";
 import { gameTypeToUi, subjectToUi, subjectTokens } from "@/lib/mappings";
 import { masteryPct } from "@/lib/mastery";
 import { recommend } from "@/lib/recommend";
+import { currentKid, currentHousehold } from "@/lib/auth";
 import type {
   DbHousehold,
   DbKid,
@@ -30,9 +32,27 @@ const NEW_QUIZ_WINDOW_DAYS = 7;
 const DEFAULT_PCT = 50;
 
 export default async function KindPage() {
-  const kid = (await db.kid.findUnique({
-    where: { id: DEMO_KID_ID },
-  })) as DbKid | null;
+  const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true";
+
+  let kid: DbKid | null;
+  if (authEnabled) {
+    kid = (await currentKid()) as DbKid | null;
+    if (!kid) {
+      // Server Components cannot set cookies — delegate cookie-setting
+      // to a Route Handler that bounces back to /kind once the cookie is set.
+      const hh = await currentHousehold();
+      if (!hh) redirect("/login?next=/kind");
+      if (hh.kids.length === 1) {
+        redirect("/api/kind/auto-pick");
+      } else {
+        redirect("/kind/picker");
+      }
+    }
+  } else {
+    kid = (await db.kid.findUnique({
+      where: { id: DEMO_KID_ID },
+    })) as DbKid | null;
+  }
   if (!kid) {
     throw new Error(
       `Demo kid "${DEMO_KID_ID}" not found. Run "npm run db:seed" first — see docs/backend.md.`,

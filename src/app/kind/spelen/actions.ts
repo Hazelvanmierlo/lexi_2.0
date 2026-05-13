@@ -7,6 +7,7 @@ import {
   gradeAndScore,
   computeSessionFinalState,
   type PerQuestionEntry,
+  type Reveal,
 } from "@/lib/quiz-session";
 import type { Subject } from "@/generated/prisma/enums";
 
@@ -23,11 +24,28 @@ const SubmitInput = z.object({
   /** The kid's answer. Shape depends on the quiz's gameType — server validates. */
   answer: z.unknown(),
   msSpent: z.number().int().min(0).max(15 * 60 * 1000),
+  /**
+   * Set true for review-round answers — these never earn coins, never bump
+   * the session correctCount, and never contribute to mastery (mastery only
+   * looks at the first-pass score recorded on the Session row).
+   */
+  isReview: z.boolean().optional(),
 });
 
 const FinishInput = z.object({
   sessionId: z.string().min(1),
 });
+
+const UseHintInput = z.object({
+  sessionId: z.string().min(1),
+  questionId: z.string().min(1),
+});
+
+export type UseHintResult =
+  | { ok: true; hint: string; coinsCharged: number; newCoinsBalance: number }
+  | { ok: false; reason: "no-hint" | "already-used" | "session-done" };
+
+const HINT_COST = 3;
 
 export type StartResult = {
   sessionId: string;
@@ -40,6 +58,8 @@ export type SubmitResult = {
   /** Aggregate so far. */
   correctCount: number;
   totalAnswered: number;
+  /** Canonical-answer reveal for the game UI to render feedback. */
+  reveal: Reveal;
 };
 
 export type FinishResult = {
@@ -86,7 +106,8 @@ export async function startSession(input: z.infer<typeof StartInput>): Promise<S
 // ─── submit one answer ─────────────────────────────────────────────────────
 
 export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<SubmitResult> {
-  const { sessionId, questionId, answer, msSpent } = SubmitInput.parse(input);
+  const { sessionId, questionId, answer, msSpent, isReview } =
+    SubmitInput.parse(input);
 
   type SessionRow = {
     id: string;
@@ -127,15 +148,18 @@ export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<
 
   const payload = validatePayload(session.quiz.gameType, question.payload);
 
-  const graded = gradeAndScore({
-    gameType: session.quiz.gameType,
-    payload,
-    questionId,
-    questionOrder: question.order,
-    answer,
-    msSpent,
-    priorEntries,
-  });
+  const graded = gradeAndScore(
+    {
+      gameType: session.quiz.gameType,
+      payload,
+      questionId,
+      questionOrder: question.order,
+      answer,
+      msSpent,
+      priorEntries,
+    },
+    { isReview: isReview === true },
+  );
 
   if (graded.reused) {
     return {
@@ -143,10 +167,33 @@ export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<
       coinsAwarded: graded.coinsAwarded,
       correctCount: session.correctCount,
       totalAnswered: priorEntries.length,
+      reveal: graded.reveal,
     };
   }
 
-  const nextPerQuestion = [...priorEntries, graded.newEntry];
+  // Review-round answers don't replace the original entry — we keep the
+  // first-attempt grade on the Session row (so mastery + correctCount stay
+  // honest). The reveal is still returned so the UI shows feedback.
+  if (isReview === true) {
+    return {
+      correct: graded.correct,
+      coinsAwarded: 0,
+      correctCount: session.correctCount,
+      totalAnswered: priorEntries.length,
+      reveal: graded.reveal,
+    };
+  }
+
+  // Detect a hint-only stub from useHint(): replace it in place instead of
+  // appending a second entry for the same question.
+  const stubIdx = priorEntries.findIndex(
+    (e) => e.questionId === questionId && e.hintUsed === true && e.msSpent === 0,
+  );
+  const nextPerQuestion =
+    stubIdx >= 0
+      ? priorEntries.map((e, i) => (i === stubIdx ? graded.newEntry : e))
+      : [...priorEntries, graded.newEntry];
+
   const newCorrectCount =
     session.correctCount + (graded.correct ? 1 : 0);
 
@@ -165,6 +212,7 @@ export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<
     coinsAwarded: graded.coinsAwarded,
     correctCount: newCorrectCount,
     totalAnswered: nextPerQuestion.length,
+    reveal: graded.reveal,
   };
 }
 
@@ -273,5 +321,106 @@ export async function finishSession(input: z.infer<typeof FinishInput>): Promise
     coinsEarned: session.coinsEarned,
     completionBonus: final.bonus,
     totalCoins: final.totalSessionCoins,
+  };
+}
+
+// ─── reveal a hint (costs HINT_COST coins, once per question) ──────────────
+
+export async function useHint(
+  input: z.infer<typeof UseHintInput>,
+): Promise<UseHintResult> {
+  const { sessionId, questionId } = UseHintInput.parse(input);
+
+  type SessionRow = {
+    id: string;
+    status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+    kidId: string;
+    perQuestion: unknown;
+    quiz: { gameType: GameType };
+  };
+
+  const session = (await db.session.findUnique({
+    where: { id: sessionId },
+    select: {
+      id: true,
+      status: true,
+      kidId: true,
+      perQuestion: true,
+      quiz: { select: { gameType: true } },
+    },
+  })) as SessionRow | null;
+
+  if (!session) throw new Error(`Session "${sessionId}" not found`);
+  if (session.status !== "IN_PROGRESS") {
+    return { ok: false, reason: "session-done" };
+  }
+
+  const question = (await db.question.findUnique({
+    where: { id: questionId },
+    select: { id: true, order: true, payload: true },
+  })) as { id: string; order: number; payload: unknown } | null;
+  if (!question) throw new Error(`Question "${questionId}" not found`);
+
+  const payload = validatePayload(session.quiz.gameType, question.payload);
+  const hintText = (payload as { hint?: string }).hint;
+  if (!hintText) return { ok: false, reason: "no-hint" };
+
+  const priorEntries: PerQuestionEntry[] = Array.isArray(session.perQuestion)
+    ? (session.perQuestion as PerQuestionEntry[])
+    : [];
+
+  const existing = priorEntries.find((e) => e.questionId === questionId);
+  if (existing?.hintUsed) {
+    return { ok: false, reason: "already-used" };
+  }
+
+  // Insert (or upgrade) the perQuestion entry with hintUsed: true. If the kid
+  // hasn't answered yet we add a stub so the next submitAnswer can detect it
+  // and merge.
+  let nextPerQuestion: PerQuestionEntry[];
+  if (existing) {
+    nextPerQuestion = priorEntries.map((e) =>
+      e.questionId === questionId ? { ...e, hintUsed: true } : e,
+    );
+  } else {
+    const stub: PerQuestionEntry = {
+      questionId,
+      order: question.order,
+      correct: false,
+      msSpent: 0,
+      coinsAwarded: 0,
+      hintUsed: true,
+    };
+    nextPerQuestion = [...priorEntries, stub];
+  }
+
+  // Decrement kid coins (clamped at 0).
+  const kidRow = (await db.kid.findUnique({
+    where: { id: session.kidId },
+    select: { coins: true },
+  })) as { coins: number } | null;
+  if (!kidRow) throw new Error(`Kid "${session.kidId}" not found`);
+  const charge = Math.min(HINT_COST, kidRow.coins);
+  const newCoinsBalance = kidRow.coins - charge;
+
+  await db.$transaction([
+    db.session.update({
+      where: { id: sessionId },
+      data: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        perQuestion: nextPerQuestion as any,
+      },
+    }),
+    db.kid.update({
+      where: { id: session.kidId },
+      data: { coins: newCoinsBalance },
+    }),
+  ]);
+
+  return {
+    ok: true,
+    hint: hintText,
+    coinsCharged: charge,
+    newCoinsBalance,
   };
 }

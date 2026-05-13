@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { ClerkProvider } from "@clerk/nextjs";
+import { CartProvider } from "@/lib/cart-context";
+import { CartDrawer } from "@/components/shop/cart-drawer";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -37,7 +40,8 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   const messages = await getMessages();
-  return (
+  const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true";
+  const tree = (
     <html
       lang={locale}
       className={`${display.variable} ${sans.variable} ${mono.variable}`}
@@ -50,9 +54,13 @@ export default async function RootLayout({
           Naar inhoud
         </a>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
         </NextIntlClientProvider>
       </body>
     </html>
   );
+  return authEnabled ? <ClerkProvider>{tree}</ClerkProvider> : tree;
 }

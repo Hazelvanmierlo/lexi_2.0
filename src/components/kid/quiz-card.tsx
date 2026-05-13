@@ -5,6 +5,7 @@ import { McPreview } from "./previews/mc-preview";
 import { TypePreview } from "./previews/type-preview";
 import { MatchPreview } from "./previews/match-preview";
 import { DragOrderPreview } from "./previews/drag-order-preview";
+import { CatapultPreview } from "./previews/catapult-preview";
 
 type GameType = "mc" | "type" | "match" | "drag-order" | "catapult";
 
@@ -19,14 +20,12 @@ type Props = {
   isNew?: boolean;
 };
 
-// CATAPULT has no dedicated preview yet — fall back to MC so the card renders.
-// Replace with a CatapultPreview when designed.
 const PREVIEW: Record<GameType, () => React.JSX.Element> = {
   "mc": McPreview,
   "type": TypePreview,
   "match": MatchPreview,
   "drag-order": DragOrderPreview,
-  "catapult": McPreview,
+  "catapult": CatapultPreview,
 };
 
 const SUBJECT_CHIP: Record<Props["subjectKey"], string> = {

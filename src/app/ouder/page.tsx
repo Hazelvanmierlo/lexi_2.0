@@ -1,10 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { currentHousehold, currentParent } from "@/lib/auth";
+import { LogoutButton } from "@/components/ouder/logout-button";
 import { Nav } from "@/components/nav/nav";
 import { Footer } from "@/components/landing/footer";
 import { MascotImage } from "@/components/ui/mascot";
-import { Coins, Flame, TrendingUp, MessageCircle } from "lucide-react";
+import { Coins, Flame, TrendingUp, MessageCircle, Lock } from "lucide-react";
 import type {
   DbHousehold,
   DbKid,
@@ -16,10 +19,71 @@ type ParentWithRel = DbParent & {
   household: DbHousehold & { kids: DbKid[] };
 };
 
+// View-model the page renders against. Both the demo path and the auth-on
+// path normalize into this shape so the JSX below stays unchanged.
+type OuderViewModel = {
+  parentEmail: string;
+  household: {
+    id: string;
+    subscriptionTier: "MONTHLY" | "YEARLY" | "FAMILY" | null;
+    trialEndsAt: Date | null;
+  };
+  kids: Array<{ id: string; name: string; groep: number }>;
+};
+
 export const dynamic = "force-dynamic";
 
-// Demo identity until Clerk auth lands in Phase 3.
+// Demo identity used when AUTH is disabled.
 const DEMO_PARENT_ID = "seed-parent-demo";
+
+async function loadDemoHousehold(): Promise<OuderViewModel | null> {
+  const parent = (await db.parent.findUnique({
+    where: { id: DEMO_PARENT_ID },
+    include: {
+      household: { include: { kids: true } },
+    },
+  })) as ParentWithRel | null;
+  if (!parent) return null;
+  return {
+    parentEmail: parent.email,
+    household: {
+      id: parent.household.id,
+      subscriptionTier: parent.household.subscriptionTier,
+      trialEndsAt: parent.household.trialEndsAt,
+    },
+    kids: parent.household.kids.map((k) => ({
+      id: k.id,
+      name: k.name,
+      groep: k.groep,
+    })),
+  };
+}
+
+async function loadAuthedHousehold(): Promise<OuderViewModel | null> {
+  const parent = await currentParent();
+  if (!parent) return null;
+  const household = await currentHousehold();
+  if (!household) return null;
+  // currentHousehold() doesn't return subscription fields, so we do an
+  // extra targeted lookup keyed off the household id.
+  const subscription = (await db.household.findUnique({
+    where: { id: household.id },
+    select: { subscriptionTier: true, trialEndsAt: true },
+  })) as Pick<DbHousehold, "subscriptionTier" | "trialEndsAt"> | null;
+  return {
+    parentEmail: parent.email,
+    household: {
+      id: household.id,
+      subscriptionTier: subscription?.subscriptionTier ?? null,
+      trialEndsAt: subscription?.trialEndsAt ?? null,
+    },
+    kids: household.kids.map((k) => ({
+      id: k.id,
+      name: k.name,
+      groep: k.groep,
+    })),
+  };
+}
 
 // SEO learning-goal rows stay static until MasteryRecord ships — replacing
 // these is a one-line swap-over.
@@ -54,20 +118,22 @@ export default async function OuderPage() {
 
 async function OuderBody() {
   const t = await getTranslations("ouder");
+  const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true";
 
-  const parent = (await db.parent.findUnique({
-    where: { id: DEMO_PARENT_ID },
-    include: {
-      household: { include: { kids: true } },
-    },
-  })) as ParentWithRel | null;
-  if (!parent) {
+  const data = authEnabled
+    ? await loadAuthedHousehold()
+    : await loadDemoHousehold();
+
+  if (authEnabled && !data) redirect("/login?next=/ouder");
+  if (!data) {
     throw new Error(
       `Demo parent "${DEMO_PARENT_ID}" not found. Run "npm run db:seed" first — see docs/backend.md.`,
     );
   }
-  const kids = parent.household.kids;
-  const primaryKid: DbKid | undefined = kids[0];
+
+  const kids = data.kids;
+  const primaryKid: { id: string; name: string; groep: number } | undefined =
+    kids[0];
 
   // This-week stats — server-side aggregation.
   const weekStart = startOfWeek();
@@ -114,18 +180,21 @@ async function OuderBody() {
     },
   ];
 
-  const parentNameFromEmail = parent.email.split("@")[0].split(/[+.]/)[0];
+  const parentNameFromEmail = data.parentEmail.split("@")[0].split(/[+.]/)[0];
 
   return (
     <div className="mx-auto max-w-[980px] px-5 py-10 md:py-16">
       {/* Greeting */}
-      <header>
-        <p className="font-mono text-xs uppercase tracking-wider text-ink-3">
-          {t("kicker")} · week {weekNumber(new Date())}
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
-          {t("greeting", { name: capitalize(parentNameFromEmail) || "ouder" })}
-        </h1>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-wider text-ink-3">
+            {t("kicker")} · week {weekNumber(new Date())}
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
+            {t("greeting", { name: capitalize(parentNameFromEmail) || "ouder" })}
+          </h1>
+        </div>
+        {authEnabled && <LogoutButton />}
       </header>
 
       {/* Kid list */}
@@ -135,10 +204,13 @@ async function OuderBody() {
         </h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           {kids.map((k) => (
-            <li key={k.id}>
+            <li
+              key={k.id}
+              className="rounded-lexi-lg border border-line bg-card hover:border-primary hover:shadow-lexi-sm"
+            >
               <Link
                 href="/kind"
-                className="flex items-center gap-3 rounded-lexi-lg border border-line bg-card p-4 hover:border-primary hover:shadow-lexi-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="flex items-center gap-3 p-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft">
                   <MascotImage
@@ -159,6 +231,15 @@ async function OuderBody() {
                   →
                 </span>
               </Link>
+              <div className="flex items-center justify-end border-t border-line-2 px-4 py-2">
+                <Link
+                  href={`/ouder/kind/${k.id}/pin`}
+                  className="inline-flex items-center gap-1 text-xs text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <Lock className="h-3 w-3" aria-hidden="true" />
+                  PIN beheren
+                </Link>
+              </div>
             </li>
           ))}
         </ul>
@@ -244,7 +325,7 @@ async function OuderBody() {
             {t("manageSection.title")}
           </h3>
           <p className="mt-1 text-sm text-ink-2">
-            {subscriptionLine(parent.household)}
+            {subscriptionLine(data.household)}
           </p>
         </div>
         <a

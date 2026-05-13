@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import { Btn } from "@/components/ui/btn";
 import { MascotImage } from "@/components/ui/mascot";
 import { RegionPicker } from "./region-picker";
+import { NavCartIcon } from "./nav-cart-icon";
 
 export function Nav() {
   const t = useTranslations("nav");
@@ -12,7 +13,7 @@ export function Nav() {
     { label: t("together"),   href: "/#samen" },
     { label: t("subjects"),   href: "/#vakken" },
     { label: t("shop"),       href: "/shop" },
-    { label: t("pricing"),    href: "/#prijzen" },
+    { label: t("wordLid"),    href: "/word-lid" },
     { label: t("faq"),        href: "/#faq" },
   ];
   return (
@@ -38,18 +39,20 @@ export function Nav() {
           ))}
         </nav>
 
-        {/* Desktop — right side: signin + region + CTA */}
+        {/* Desktop — right side: signin + region + cart + CTA */}
         <div className="hidden shrink-0 items-center gap-3 md:flex">
           <RegionPicker />
-          <Link href="/signin" className="text-sm text-ink-2 hover:text-ink">
+          <Link href="/login" className="text-sm text-ink-2 hover:text-ink">
             {t("signIn")}
           </Link>
+          <NavCartIcon />
           <Btn href="/signup">{t("ctaTrial")}</Btn>
         </div>
 
-        {/* Mobile — region picker + hamburger */}
+        {/* Mobile — region picker + cart + hamburger */}
         <div className="flex items-center gap-2 md:hidden">
           <RegionPicker />
+          <NavCartIcon />
           <button
             type="button"
             aria-label={t("menu")}

@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Check, X } from "lucide-react";
 import type { CatapultPayload } from "@/lib/quiz-schemas";
+
+export type CatapultReveal = { correctIdx: number; chosenIdx: number | null };
 
 // "Tap to fire" catapult.
 //
@@ -20,10 +23,12 @@ export function CatapultGame({
   payload,
   onAnswer,
   locked,
+  reveal,
 }: {
   payload: CatapultPayload;
   onAnswer: (idx: number) => void;
   locked: boolean;
+  reveal?: CatapultReveal;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "ready" });
 
@@ -34,6 +39,19 @@ export function CatapultGame({
       setStage({ kind: "ready" });
       onAnswer(idx);
     }, FLIGHT_MS);
+  }
+
+  function targetClass(i: number): string {
+    if (!locked || !reveal) {
+      return "border-ink bg-card text-ink shadow-lexi-sm hover:-translate-y-0.5";
+    }
+    if (i === reveal.correctIdx) {
+      return "border-ok bg-ok-soft text-ink shadow-lexi-sm";
+    }
+    if (i === reveal.chosenIdx) {
+      return "border-primary bg-primary-soft text-primary-ink shadow-lexi-sm";
+    }
+    return "border-line bg-card text-ink opacity-60";
   }
 
   return (
@@ -49,21 +67,31 @@ export function CatapultGame({
           role="radiogroup"
           aria-label={payload.q}
         >
-          {payload.options.map((opt, i) => (
-            <li key={`${i}-${opt}`}>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={false}
-                disabled={locked || stage.kind === "flying"}
-                onClick={() => fire(i)}
-                className="flex w-full items-center justify-center rounded-lexi border-2 border-ink bg-card px-3 py-4 text-center font-display text-lg font-bold text-ink shadow-lexi-sm transition-transform hover:-translate-y-0.5 disabled:opacity-60"
-                data-target-idx={i}
-              >
-                {opt}
-              </button>
-            </li>
-          ))}
+          {payload.options.map((opt, i) => {
+            const showCorrect = locked && reveal && i === reveal.correctIdx;
+            const showWrong =
+              locked &&
+              reveal &&
+              reveal.chosenIdx === i &&
+              reveal.chosenIdx !== reveal.correctIdx;
+            return (
+              <li key={`${i}-${opt}`}>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={false}
+                  disabled={locked || stage.kind === "flying"}
+                  onClick={() => fire(i)}
+                  className={`flex w-full items-center justify-center gap-2 rounded-lexi border-2 px-3 py-4 text-center font-display text-lg font-bold transition-transform disabled:cursor-default ${targetClass(i)}`}
+                  data-target-idx={i}
+                >
+                  <span>{opt}</span>
+                  {showCorrect && <Check className="h-5 w-5 text-ok" aria-hidden="true" />}
+                  {showWrong && <X className="h-5 w-5 text-primary" aria-hidden="true" />}
+                </button>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Flight area + catapult */}

@@ -5,6 +5,7 @@ import { AdminHeader } from "@/components/admin/admin-header";
 import { QuizEditor } from "@/components/admin/quiz-editor";
 import type { DbQuiz } from "@/lib/db-types";
 import type { GameType } from "@/generated/prisma/enums";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,9 @@ export default async function QuizEditPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  if (process.env.NEXT_PUBLIC_AUTH_ENABLED === "true") {
+    await requireAdmin();
+  }
   const { id } = await params;
 
   const quiz = (await db.quiz.findUnique({

@@ -8,6 +8,7 @@
 // Spec: design_handoff/README.md §8.
 
 import { z } from "zod";
+import { normaliseAndCompare } from "./type-tolerance";
 
 // Shared bits ────────────────────────────────────────────────────────────────
 
@@ -19,6 +20,7 @@ export const McPayload = z.object({
   q: nonEmpty,
   options: z.array(nonEmpty).length(4),
   correctIdx: z.number().int().min(0).max(3),
+  hint: z.string().optional(),
 });
 export type McPayload = z.infer<typeof McPayload>;
 
@@ -28,6 +30,7 @@ export const TypePayload = z.object({
   q: nonEmpty,
   answer: nonEmpty,
   accept: z.array(nonEmpty).optional(), // additional accepted spellings
+  hint: z.string().optional(),
 });
 export type TypePayload = z.infer<typeof TypePayload>;
 
@@ -37,6 +40,7 @@ export const CatapultPayload = z.object({
   q: nonEmpty,
   options: z.array(nonEmpty).length(4),
   correctIdx: z.number().int().min(0).max(3),
+  hint: z.string().optional(),
 });
 export type CatapultPayload = z.infer<typeof CatapultPayload>;
 
@@ -45,6 +49,7 @@ export type CatapultPayload = z.infer<typeof CatapultPayload>;
 export const MatchPayload = z.object({
   q: nonEmpty,
   pairs: z.array(z.object({ l: nonEmpty, r: nonEmpty })).length(5),
+  hint: z.string().optional(),
 });
 export type MatchPayload = z.infer<typeof MatchPayload>;
 
@@ -56,6 +61,7 @@ export const DragOrderPayload = z
     q: nonEmpty,
     items: z.array(nonEmpty).min(2).max(8),
     correctOrder: z.array(nonEmpty).min(2).max(8),
+    hint: z.string().optional(),
   })
   .refine(
     (p) =>
@@ -112,10 +118,8 @@ export function gradeAnswer(
     case "TYPE": {
       const p = payload as TypePayload;
       if (typeof answer !== "string") return false;
-      const normalize = (s: string) =>
-        s.trim().toLocaleLowerCase("nl-NL").replace(/\s+/g, " ");
-      const target = [p.answer, ...(p.accept ?? [])].map(normalize);
-      return target.includes(normalize(answer));
+      const candidates = [p.answer, ...(p.accept ?? [])];
+      return candidates.some((c) => normaliseAndCompare(answer, c));
     }
     case "MATCH": {
       const p = payload as MatchPayload;
