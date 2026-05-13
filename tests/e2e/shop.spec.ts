@@ -4,7 +4,8 @@ test("/shop shows 24 workbooks + Uitblinker hero", async ({ page }) => {
   await page.goto("/shop");
   await expect(page.getByText("Uitblinker", { exact: false }).first()).toBeVisible();
   await expect(page.locator("[data-test='workbook-card']")).toHaveCount(24);
-  await expect(page.getByLabel(/Winkelmandje/)).toBeVisible();
+  // Nav cart icon is always visible (badge appears once cart hydrates with items).
+  await expect(page.getByLabel(/Winkelmand/).first()).toBeVisible();
 });
 
 test("filtering by ?subject=taal shows 8 workbooks", async ({ page }) => {
