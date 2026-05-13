@@ -1,18 +1,25 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/lib/cart-context";
 
+/**
+ * Bottom-right floating pill. Visible only when the cart has items
+ * (and after client hydration so SSR / CSR markup matches).
+ */
 export function CartPill() {
-  const t = useTranslations("shop.cart");
+  const { itemCount, hydrated } = useCart();
+  if (!hydrated || itemCount === 0) return null;
   return (
-    <button
-      type="button"
-      aria-label={t("label")}
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-medium text-white shadow-lexi-lg hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    <Link
+      href="/winkelmand"
+      aria-label={`Naar winkelmand met ${itemCount} ${itemCount === 1 ? "artikel" : "artikelen"}`}
+      className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-white shadow-lexi transition hover:opacity-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
-      <ShoppingCart className="h-5 w-5" />
-      <span>{t("empty")}</span>
-    </button>
+      <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+      <span className="font-semibold tabular-nums">{itemCount}</span>
+      <span className="text-sm">in winkelmand</span>
+    </Link>
   );
 }
