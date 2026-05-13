@@ -8,6 +8,7 @@
 // Spec: design_handoff/README.md §8.
 
 import { z } from "zod";
+import { normaliseAndCompare } from "./type-tolerance";
 
 // Shared bits ────────────────────────────────────────────────────────────────
 
@@ -117,10 +118,8 @@ export function gradeAnswer(
     case "TYPE": {
       const p = payload as TypePayload;
       if (typeof answer !== "string") return false;
-      const normalize = (s: string) =>
-        s.trim().toLocaleLowerCase("nl-NL").replace(/\s+/g, " ");
-      const target = [p.answer, ...(p.accept ?? [])].map(normalize);
-      return target.includes(normalize(answer));
+      const candidates = [p.answer, ...(p.accept ?? [])];
+      return candidates.some((c) => normaliseAndCompare(answer, c));
     }
     case "MATCH": {
       const p = payload as MatchPayload;

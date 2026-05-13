@@ -128,7 +128,10 @@ describe("gradeAnswer", () => {
     const p = { q: "?", answer: "Wandelt" };
     expect(gradeAnswer("TYPE", p, "wandelt")).toBe(true);
     expect(gradeAnswer("TYPE", p, "  WANDELT ")).toBe(true);
-    expect(gradeAnswer("TYPE", p, "wandeld")).toBe(false);
+    // Levenshtein-1 typo tolerance (Theme A): "wandeld" accepted.
+    expect(gradeAnswer("TYPE", p, "wandeld")).toBe(true);
+    // Two-character difference is still rejected.
+    expect(gradeAnswer("TYPE", p, "wandabd")).toBe(false);
   });
 
   it("TYPE: accept list allows extra spellings", () => {

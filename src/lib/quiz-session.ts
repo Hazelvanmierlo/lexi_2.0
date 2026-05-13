@@ -15,7 +15,16 @@ import {
   streakMultiplier,
   completionBonus,
 } from "./coins";
-import { gradeAnswer, type AnyPayload, type GameType } from "./quiz-schemas";
+import {
+  gradeAnswer,
+  type AnyPayload,
+  type CatapultPayload,
+  type DragOrderPayload,
+  type GameType,
+  type MatchPayload,
+  type McPayload,
+  type TypePayload,
+} from "./quiz-schemas";
 import { computeMasteryUpdate } from "./mastery";
 
 export type PerQuestionEntry = {
@@ -24,7 +33,57 @@ export type PerQuestionEntry = {
   correct: boolean;
   msSpent: number;
   coinsAwarded: number;
+  /** True when the kid used the hint on this question. */
+  hintUsed?: boolean;
 };
+
+// ─── reveal payload ────────────────────────────────────────────────────────
+//
+// After grading, the server tells the client what the correct answer was so
+// the game UI can render reveal feedback (green correct, red chosen-wrong).
+export type Reveal =
+  | { kind: "MC"; correctIdx: number; chosenIdx: number | null }
+  | { kind: "CATAPULT"; correctIdx: number; chosenIdx: number | null }
+  | { kind: "TYPE"; correctText: string }
+  | { kind: "DRAG_ORDER"; correctOrder: string[] }
+  | { kind: "MATCH"; correctPairs: Array<{ l: string; r: string }> };
+
+function buildReveal(
+  gameType: GameType,
+  payload: AnyPayload,
+  answer: unknown,
+): Reveal {
+  switch (gameType) {
+    case "MC": {
+      const p = payload as McPayload;
+      return {
+        kind: "MC",
+        correctIdx: p.correctIdx,
+        chosenIdx: typeof answer === "number" ? answer : null,
+      };
+    }
+    case "CATAPULT": {
+      const p = payload as CatapultPayload;
+      return {
+        kind: "CATAPULT",
+        correctIdx: p.correctIdx,
+        chosenIdx: typeof answer === "number" ? answer : null,
+      };
+    }
+    case "TYPE": {
+      const p = payload as TypePayload;
+      return { kind: "TYPE", correctText: p.answer };
+    }
+    case "DRAG_ORDER": {
+      const p = payload as DragOrderPayload;
+      return { kind: "DRAG_ORDER", correctOrder: p.correctOrder };
+    }
+    case "MATCH": {
+      const p = payload as MatchPayload;
+      return { kind: "MATCH", correctPairs: p.pairs };
+    }
+  }
+}
 
 // ─── per-answer scoring ────────────────────────────────────────────────────
 
@@ -53,39 +112,62 @@ export type GradeResult = {
    * caller to skip a DB write entirely.
    */
   existingEntry?: PerQuestionEntry;
+  /** Canonical-answer reveal so the client can render the feedback UI. */
+  reveal: Reveal;
 };
 
-export function gradeAndScore(input: GradeInput): GradeResult {
-  // Idempotency — if this question was already answered, return its recorded
-  // result instead of grading again. This makes the action safe to retry.
+export type GradeOptions = {
+  /**
+   * Review-round answer (during the end-of-quiz retry phase). Reviews never
+   * award coins and don't bump the session correctCount — see actions.ts.
+   */
+  isReview?: boolean;
+};
+
+export function gradeAndScore(
+  input: GradeInput,
+  options: GradeOptions = {},
+): GradeResult {
+  const reveal = buildReveal(input.gameType, input.payload, input.answer);
+
+  // Idempotency — if this question was already answered (or has a hint-only
+  // stub), return its recorded result instead of re-grading on resubmission.
+  // We still want to allow a stub (hintUsed: true, correct: false placeholder
+  // with msSpent 0) to be REPLACED by a real answer, so distinguish here.
   const prior = input.priorEntries.find(
     (e) => e.questionId === input.questionId,
   );
-  if (prior) {
+  const isHintStub =
+    !!prior && prior.hintUsed === true && prior.msSpent === 0;
+
+  if (prior && !isHintStub) {
     return {
       correct: prior.correct,
       coinsAwarded: prior.coinsAwarded,
       newEntry: prior,
       reused: true,
       existingEntry: prior,
+      reveal,
     };
   }
 
   const correct = gradeAnswer(input.gameType, input.payload, input.answer);
 
   // Streak counts the run going into this answer. If the kid was on 4 and
-  // gets this one right, the multiplier reflects the new run of 5.
+  // gets this one right, the multiplier reflects the new run of 5. Reviews
+  // don't earn coins, so they don't enter the streak math either.
   const trailing = countTrailingCorrect(input.priorEntries);
   const newRun = correct ? trailing + 1 : 0;
   const multiplier = streakMultiplier(newRun);
 
-  const coinsAwarded = correct
-    ? coinsFor({
-        correct: true,
-        msSpent: input.msSpent,
-        streakBonus: multiplier,
-      })
-    : 0;
+  const coinsAwarded =
+    correct && !options.isReview
+      ? coinsFor({
+          correct: true,
+          msSpent: input.msSpent,
+          streakBonus: multiplier,
+        })
+      : 0;
 
   const newEntry: PerQuestionEntry = {
     questionId: input.questionId,
@@ -93,9 +175,11 @@ export function gradeAndScore(input: GradeInput): GradeResult {
     correct,
     msSpent: input.msSpent,
     coinsAwarded,
+    // Preserve hint flag if the kid used one before answering.
+    ...(prior?.hintUsed ? { hintUsed: true } : {}),
   };
 
-  return { correct, coinsAwarded, newEntry, reused: false };
+  return { correct, coinsAwarded, newEntry, reused: false, reveal };
 }
 
 // ─── finish-session computation ────────────────────────────────────────────
