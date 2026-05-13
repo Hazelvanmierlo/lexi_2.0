@@ -83,11 +83,22 @@
 
 .coin-count-pulse { animation: coin-count-pulse 360ms ease-out; }
 
+/* Match — wrong pair flashes red briefly before unpairing both items. */
+@keyframes match-flash-wrong {
+  0%, 100% { background-color: var(--color-card); border-color: var(--color-line); }
+  20%, 80% { background-color: var(--color-primary-soft); border-color: var(--color-primary); }
+}
+
+.match-flash-wrong {
+  animation: match-flash-wrong 400ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .question-enter,
   .coin-pop,
   .confetti-bit,
-  .coin-count-pulse {
+  .coin-count-pulse,
+  .match-flash-wrong {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
