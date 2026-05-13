@@ -6,6 +6,7 @@ import { FilterBar } from "@/components/shop/filter-bar";
 import { UitblinkerHero } from "@/components/shop/uitblinker-hero";
 import { WerkboekenGrid } from "@/components/shop/werkboeken-grid";
 import { CartPill } from "@/components/shop/cart-pill";
+import { TrustSignals } from "@/components/shop/trust-signals";
 import { centsToEuro, subjectToUi } from "@/lib/mappings";
 import { applyShopFilters } from "@/lib/shop-filter";
 import type { DbWorkbookSku } from "@/lib/db-types";
@@ -47,6 +48,7 @@ export default async function ShopPage({
       <ShopHeader />
       <main id="main-content" className="mx-auto max-w-[1200px] space-y-10 px-5 py-10">
         <ShopHeading />
+        <TrustSignals />
         <FilterBar />
         <UitblinkerHero />
         <WerkboekenGrid workbooks={workbooksUi} />

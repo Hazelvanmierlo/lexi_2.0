@@ -5,6 +5,7 @@ import { BookDetail } from "@/components/shop/book-detail";
 import { RelatedBooks } from "@/components/shop/related-books";
 import { ShopHeader } from "@/components/shop/shop-header";
 import { CartPill } from "@/components/shop/cart-pill";
+import { TrustSignals } from "@/components/shop/trust-signals";
 import type { DbWorkbookSku } from "@/lib/db-types";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +41,9 @@ export default async function BookDetailPage({
           <span> / Werkboeken / {book.title}</span>
         </nav>
         <BookDetail book={book} />
+        <div className="mt-10">
+          <TrustSignals />
+        </div>
         <RelatedBooks books={related} groep={book.groepBucket} />
       </main>
       <CartPill />
