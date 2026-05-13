@@ -36,6 +36,17 @@ const FinishInput = z.object({
   sessionId: z.string().min(1),
 });
 
+const UseHintInput = z.object({
+  sessionId: z.string().min(1),
+  questionId: z.string().min(1),
+});
+
+export type UseHintResult =
+  | { ok: true; hint: string; coinsCharged: number; newCoinsBalance: number }
+  | { ok: false; reason: "no-hint" | "already-used" | "session-done" };
+
+const HINT_COST = 3;
+
 export type StartResult = {
   sessionId: string;
   totalQuestions: number;
@@ -310,5 +321,106 @@ export async function finishSession(input: z.infer<typeof FinishInput>): Promise
     coinsEarned: session.coinsEarned,
     completionBonus: final.bonus,
     totalCoins: final.totalSessionCoins,
+  };
+}
+
+// ─── reveal a hint (costs HINT_COST coins, once per question) ──────────────
+
+export async function useHint(
+  input: z.infer<typeof UseHintInput>,
+): Promise<UseHintResult> {
+  const { sessionId, questionId } = UseHintInput.parse(input);
+
+  type SessionRow = {
+    id: string;
+    status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+    kidId: string;
+    perQuestion: unknown;
+    quiz: { gameType: GameType };
+  };
+
+  const session = (await db.session.findUnique({
+    where: { id: sessionId },
+    select: {
+      id: true,
+      status: true,
+      kidId: true,
+      perQuestion: true,
+      quiz: { select: { gameType: true } },
+    },
+  })) as SessionRow | null;
+
+  if (!session) throw new Error(`Session "${sessionId}" not found`);
+  if (session.status !== "IN_PROGRESS") {
+    return { ok: false, reason: "session-done" };
+  }
+
+  const question = (await db.question.findUnique({
+    where: { id: questionId },
+    select: { id: true, order: true, payload: true },
+  })) as { id: string; order: number; payload: unknown } | null;
+  if (!question) throw new Error(`Question "${questionId}" not found`);
+
+  const payload = validatePayload(session.quiz.gameType, question.payload);
+  const hintText = (payload as { hint?: string }).hint;
+  if (!hintText) return { ok: false, reason: "no-hint" };
+
+  const priorEntries: PerQuestionEntry[] = Array.isArray(session.perQuestion)
+    ? (session.perQuestion as PerQuestionEntry[])
+    : [];
+
+  const existing = priorEntries.find((e) => e.questionId === questionId);
+  if (existing?.hintUsed) {
+    return { ok: false, reason: "already-used" };
+  }
+
+  // Insert (or upgrade) the perQuestion entry with hintUsed: true. If the kid
+  // hasn't answered yet we add a stub so the next submitAnswer can detect it
+  // and merge.
+  let nextPerQuestion: PerQuestionEntry[];
+  if (existing) {
+    nextPerQuestion = priorEntries.map((e) =>
+      e.questionId === questionId ? { ...e, hintUsed: true } : e,
+    );
+  } else {
+    const stub: PerQuestionEntry = {
+      questionId,
+      order: question.order,
+      correct: false,
+      msSpent: 0,
+      coinsAwarded: 0,
+      hintUsed: true,
+    };
+    nextPerQuestion = [...priorEntries, stub];
+  }
+
+  // Decrement kid coins (clamped at 0).
+  const kidRow = (await db.kid.findUnique({
+    where: { id: session.kidId },
+    select: { coins: true },
+  })) as { coins: number } | null;
+  if (!kidRow) throw new Error(`Kid "${session.kidId}" not found`);
+  const charge = Math.min(HINT_COST, kidRow.coins);
+  const newCoinsBalance = kidRow.coins - charge;
+
+  await db.$transaction([
+    db.session.update({
+      where: { id: sessionId },
+      data: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        perQuestion: nextPerQuestion as any,
+      },
+    }),
+    db.kid.update({
+      where: { id: session.kidId },
+      data: { coins: newCoinsBalance },
+    }),
+  ]);
+
+  return {
+    ok: true,
+    hint: hintText,
+    coinsCharged: charge,
+    newCoinsBalance,
   };
 }
