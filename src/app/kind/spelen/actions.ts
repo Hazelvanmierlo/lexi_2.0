@@ -7,6 +7,7 @@ import {
   gradeAndScore,
   computeSessionFinalState,
   type PerQuestionEntry,
+  type Reveal,
 } from "@/lib/quiz-session";
 import type { Subject } from "@/generated/prisma/enums";
 
@@ -23,6 +24,12 @@ const SubmitInput = z.object({
   /** The kid's answer. Shape depends on the quiz's gameType — server validates. */
   answer: z.unknown(),
   msSpent: z.number().int().min(0).max(15 * 60 * 1000),
+  /**
+   * Set true for review-round answers — these never earn coins, never bump
+   * the session correctCount, and never contribute to mastery (mastery only
+   * looks at the first-pass score recorded on the Session row).
+   */
+  isReview: z.boolean().optional(),
 });
 
 const FinishInput = z.object({
@@ -40,6 +47,8 @@ export type SubmitResult = {
   /** Aggregate so far. */
   correctCount: number;
   totalAnswered: number;
+  /** Canonical-answer reveal for the game UI to render feedback. */
+  reveal: Reveal;
 };
 
 export type FinishResult = {
@@ -86,7 +95,8 @@ export async function startSession(input: z.infer<typeof StartInput>): Promise<S
 // ─── submit one answer ─────────────────────────────────────────────────────
 
 export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<SubmitResult> {
-  const { sessionId, questionId, answer, msSpent } = SubmitInput.parse(input);
+  const { sessionId, questionId, answer, msSpent, isReview } =
+    SubmitInput.parse(input);
 
   type SessionRow = {
     id: string;
@@ -127,15 +137,18 @@ export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<
 
   const payload = validatePayload(session.quiz.gameType, question.payload);
 
-  const graded = gradeAndScore({
-    gameType: session.quiz.gameType,
-    payload,
-    questionId,
-    questionOrder: question.order,
-    answer,
-    msSpent,
-    priorEntries,
-  });
+  const graded = gradeAndScore(
+    {
+      gameType: session.quiz.gameType,
+      payload,
+      questionId,
+      questionOrder: question.order,
+      answer,
+      msSpent,
+      priorEntries,
+    },
+    { isReview: isReview === true },
+  );
 
   if (graded.reused) {
     return {
@@ -143,10 +156,33 @@ export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<
       coinsAwarded: graded.coinsAwarded,
       correctCount: session.correctCount,
       totalAnswered: priorEntries.length,
+      reveal: graded.reveal,
     };
   }
 
-  const nextPerQuestion = [...priorEntries, graded.newEntry];
+  // Review-round answers don't replace the original entry — we keep the
+  // first-attempt grade on the Session row (so mastery + correctCount stay
+  // honest). The reveal is still returned so the UI shows feedback.
+  if (isReview === true) {
+    return {
+      correct: graded.correct,
+      coinsAwarded: 0,
+      correctCount: session.correctCount,
+      totalAnswered: priorEntries.length,
+      reveal: graded.reveal,
+    };
+  }
+
+  // Detect a hint-only stub from useHint(): replace it in place instead of
+  // appending a second entry for the same question.
+  const stubIdx = priorEntries.findIndex(
+    (e) => e.questionId === questionId && e.hintUsed === true && e.msSpent === 0,
+  );
+  const nextPerQuestion =
+    stubIdx >= 0
+      ? priorEntries.map((e, i) => (i === stubIdx ? graded.newEntry : e))
+      : [...priorEntries, graded.newEntry];
+
   const newCorrectCount =
     session.correctCount + (graded.correct ? 1 : 0);
 
@@ -165,6 +201,7 @@ export async function submitAnswer(input: z.infer<typeof SubmitInput>): Promise<
     coinsAwarded: graded.coinsAwarded,
     correctCount: newCorrectCount,
     totalAnswered: nextPerQuestion.length,
+    reveal: graded.reveal,
   };
 }
 
