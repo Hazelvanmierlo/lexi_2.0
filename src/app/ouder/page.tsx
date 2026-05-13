@@ -7,7 +7,7 @@ import { LogoutButton } from "@/components/ouder/logout-button";
 import { Nav } from "@/components/nav/nav";
 import { Footer } from "@/components/landing/footer";
 import { MascotImage } from "@/components/ui/mascot";
-import { Coins, Flame, TrendingUp, MessageCircle } from "lucide-react";
+import { Coins, Flame, TrendingUp, MessageCircle, Lock } from "lucide-react";
 import type {
   DbHousehold,
   DbKid,
@@ -204,10 +204,13 @@ async function OuderBody() {
         </h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           {kids.map((k) => (
-            <li key={k.id}>
+            <li
+              key={k.id}
+              className="rounded-lexi-lg border border-line bg-card hover:border-primary hover:shadow-lexi-sm"
+            >
               <Link
                 href="/kind"
-                className="flex items-center gap-3 rounded-lexi-lg border border-line bg-card p-4 hover:border-primary hover:shadow-lexi-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="flex items-center gap-3 p-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft">
                   <MascotImage
@@ -228,6 +231,15 @@ async function OuderBody() {
                   →
                 </span>
               </Link>
+              <div className="flex items-center justify-end border-t border-line-2 px-4 py-2">
+                <Link
+                  href={`/ouder/kind/${k.id}/pin`}
+                  className="inline-flex items-center gap-1 text-xs text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <Lock className="h-3 w-3" aria-hidden="true" />
+                  PIN beheren
+                </Link>
+              </div>
             </li>
           ))}
         </ul>

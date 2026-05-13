@@ -105,6 +105,8 @@ model Kid {
   groep       Int // 1..8 (NL) or 1..6 (BE)
   avatar      Json             @default("{}")
   coins       Int              @default(0)
+  pinHash     String? // scrypt-hashed 4-digit PIN (format: "N:salt_b64:hash_b64"); null = no PIN
+  pinSetAt    DateTime? // when the current pinHash was set
   createdAt   DateTime         @default(now())
   sessions    Session[]
   consent     KidConsent?
