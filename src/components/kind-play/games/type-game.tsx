@@ -3,16 +3,25 @@
 import { useState } from "react";
 import type { TypePayload } from "@/lib/quiz-schemas";
 
+export type TypeReveal = { correctText: string };
+
 export function TypeGame({
   payload,
   onAnswer,
   locked,
+  reveal,
+  lastInput,
 }: {
   payload: TypePayload;
   onAnswer: (answer: string) => void;
   locked: boolean;
+  reveal?: TypeReveal;
+  /** The kid's most-recent submitted input. Shown struck-through under the
+   *  canonical answer when locked + wrong. */
+  lastInput?: string;
 }) {
   const [value, setValue] = useState("");
+  const displayValue = locked && lastInput !== undefined ? lastInput : value;
   return (
     <form
       onSubmit={(e) => {
@@ -27,10 +36,10 @@ export function TypeGame({
       <div className="mt-5 flex gap-2">
         <input
           type="text"
-          value={value}
+          value={displayValue}
           onChange={(e) => setValue(e.target.value)}
           disabled={locked}
-          autoFocus
+          autoFocus={!locked}
           autoComplete="off"
           spellCheck="false"
           className="flex-1 rounded-lexi border border-line bg-card px-4 py-3 font-display text-lg text-ink outline-none focus:border-ink disabled:opacity-60"
@@ -44,6 +53,20 @@ export function TypeGame({
           Check
         </button>
       </div>
+      {locked && reveal && (
+        <div className="mt-3 space-y-1">
+          {lastInput &&
+            lastInput.trim().toLowerCase() !==
+              reveal.correctText.trim().toLowerCase() && (
+              <p className="text-sm text-ink-3 line-through opacity-70">
+                {lastInput}
+              </p>
+            )}
+          <p className="font-display text-base font-semibold text-ok">
+            {reveal.correctText}
+          </p>
+        </div>
+      )}
     </form>
   );
 }
