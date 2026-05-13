@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -23,6 +24,7 @@ import {
 import { CartToast } from "@/components/shop/cart-toast";
 
 const CART_KEY = "lexi_cart_v1";
+const DRAWER_AUTO_CLOSE_MS = 6000;
 
 type ToastState = { id: number; message: string };
 
@@ -33,6 +35,10 @@ type CartContextValue = {
   hydrated: boolean;
   itemCount: number;
   subtotalCents: number;
+  /** Cart drawer (right slide-in) open state — auto-opens when an item is added. */
+  drawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
   addWorkbook: (sku: { slug: string; title: string; priceCents: number }, qty?: number) => void;
   addUitblinker: (item: {
     kidName: string;
@@ -51,6 +57,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerTimerRef = useRef<number | null>(null);
 
   // Hydrate from localStorage on mount.
   useEffect(() => {
@@ -84,20 +92,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }, 2000);
   }, []);
 
+  const clearDrawerTimer = useCallback(() => {
+    if (drawerTimerRef.current !== null) {
+      window.clearTimeout(drawerTimerRef.current);
+      drawerTimerRef.current = null;
+    }
+  }, []);
+
+  const openDrawer = useCallback(() => {
+    setDrawerOpen(true);
+    clearDrawerTimer();
+    drawerTimerRef.current = window.setTimeout(() => {
+      setDrawerOpen(false);
+      drawerTimerRef.current = null;
+    }, DRAWER_AUTO_CLOSE_MS);
+  }, [clearDrawerTimer]);
+
+  const closeDrawer = useCallback(() => {
+    clearDrawerTimer();
+    setDrawerOpen(false);
+  }, [clearDrawerTimer]);
+
+  // Cleanup any pending timer on unmount.
+  useEffect(() => {
+    return () => {
+      if (drawerTimerRef.current !== null) {
+        window.clearTimeout(drawerTimerRef.current);
+      }
+    };
+  }, []);
+
   const addWorkbook = useCallback<CartContextValue["addWorkbook"]>(
     (sku, qty = 1) => {
       setItems((prev) => addWorkbookPure(prev, sku, qty));
-      showToast("Toegevoegd aan winkelmand");
+      // Drawer replaces the toast for add events; toast bus remains for
+      // future non-add notifications.
+      openDrawer();
     },
-    [showToast],
+    [openDrawer],
   );
 
   const addUitblinker = useCallback<CartContextValue["addUitblinker"]>(
     (item) => {
       setItems((prev) => addUitblinkerPure(prev, item));
-      showToast("Uitblinker-abonnement toegevoegd");
+      openDrawer();
     },
-    [showToast],
+    [openDrawer],
   );
 
   const setQty = useCallback<CartContextValue["setQty"]>((idx, qty) => {
@@ -118,13 +158,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       hydrated,
       itemCount: itemCountPure(items),
       subtotalCents: subtotalCentsPure(items),
+      drawerOpen,
+      openDrawer,
+      closeDrawer,
       addWorkbook,
       addUitblinker,
       setQty,
       remove,
       clear,
     }),
-    [items, hydrated, addWorkbook, addUitblinker, setQty, remove, clear],
+    [
+      items,
+      hydrated,
+      drawerOpen,
+      openDrawer,
+      closeDrawer,
+      addWorkbook,
+      addUitblinker,
+      setQty,
+      remove,
+      clear,
+    ],
   );
 
   return (
@@ -140,3 +194,7 @@ export function useCart(): CartContextValue {
   if (!ctx) throw new Error("useCart must be used inside <CartProvider>");
   return ctx;
 }
+
+// Re-export for callers that want to dispatch a non-add notification toast.
+// Currently unused externally but kept for future use.
+export { CartContext };
