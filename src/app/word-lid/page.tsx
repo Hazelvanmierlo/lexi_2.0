@@ -3,7 +3,9 @@ import { ArrowRight, Check } from "lucide-react";
 import { db } from "@/lib/db";
 import { Nav } from "@/components/nav/nav";
 import { Footer } from "@/components/landing/footer";
+import { Breadcrumb } from "@/components/shop/breadcrumb";
 import { centsToEuro } from "@/lib/mappings";
+import { breadcrumbFor } from "@/lib/breadcrumb";
 import type { DbSubscriptionSku } from "@/lib/db-types";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +27,8 @@ export default async function WordLidPage() {
   return (
     <>
       <Nav />
-      <main id="main-content" className="mx-auto max-w-[1200px] space-y-16 px-5 py-12">
+      <main id="main-content" className="mx-auto max-w-[1200px] space-y-12 px-5 py-8">
+        <Breadcrumb crumbs={breadcrumbFor("/word-lid")} />
         {/* Heading */}
         <header className="text-center">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary-ink">

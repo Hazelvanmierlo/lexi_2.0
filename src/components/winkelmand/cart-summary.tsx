@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { centsToEuro } from "@/lib/mappings";
 import { shippingCents } from "@/lib/cart";
+import { PaymentLogos } from "@/components/shop/payment-logos";
 
 type Props = {
   subtotalCents: number;
@@ -61,6 +62,12 @@ export function CartSummary({ subtotalCents, hideCheckoutCta = false }: Props) {
           <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </Link>
       ) : null}
+      <div className="mt-5 border-t border-line pt-4">
+        <p className="text-xs text-ink-2">Veilig betalen met</p>
+        <div className="mt-2">
+          <PaymentLogos height={20} />
+        </div>
+      </div>
     </aside>
   );
 }

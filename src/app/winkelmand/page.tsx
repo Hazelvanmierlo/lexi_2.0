@@ -4,10 +4,12 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ShopHeader } from "@/components/shop/shop-header";
 import { TrustSignals } from "@/components/shop/trust-signals";
+import { Breadcrumb } from "@/components/shop/breadcrumb";
 import { CartLineItem } from "@/components/winkelmand/cart-line-item";
 import { CartSummary } from "@/components/winkelmand/cart-summary";
 import { MascotImage } from "@/components/ui/mascot";
 import { useCart } from "@/lib/cart-context";
+import { breadcrumbFor } from "@/lib/breadcrumb";
 
 export default function WinkelmandPage() {
   const { items, subtotalCents, hydrated } = useCart();
@@ -15,8 +17,9 @@ export default function WinkelmandPage() {
   return (
     <>
       <ShopHeader />
-      <main id="main-content" className="mx-auto max-w-[1100px] px-5 py-10">
-        <nav className="mb-6">
+      <main id="main-content" className="mx-auto max-w-[1100px] px-5 py-8">
+        <Breadcrumb crumbs={breadcrumbFor("/winkelmand")} />
+        <nav className="mt-4 mb-6">
           <Link
             href="/shop"
             className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-ink-2 hover:text-ink"
