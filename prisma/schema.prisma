@@ -268,16 +268,25 @@ model UitblinkerSubscription {
 }
 
 model ShopOrder {
-  id              String    @id @default(cuid())
-  householdId     String
-  household       Household @relation(fields: [householdId], references: [id])
-  stripeSessionId String    @unique
-  items           Json // [{ sku, qty, priceCents, name }]
-  totalCents      Int
-  status          String // "pending" | "paid" | "fulfilled" | "refunded"
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String     @id @default(cuid())
+  householdId      String?
+  household        Household? @relation(fields: [householdId], references: [id])
+  customerEmail    String
+  customerName     String
+  shippingLine1    String
+  shippingLine2    String?
+  shippingPostcode String
+  shippingCity     String
+  paymentSessionId String?    @unique // renamed from stripeSessionId
+  paymentProvider  String? // "mollie" | "paynl" | null for stub
+  items            Json // [{ kind: "workbook" | "uitblinker", ... }]
+  totalCents       Int
+  shippingCents    Int        @default(0)
+  status           String     @default("pending") // "pending" | "paid" | "fulfilled" | "refunded"
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
+  @@index([customerEmail, createdAt])
   @@index([householdId, createdAt])
 }
 
