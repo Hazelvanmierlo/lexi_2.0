@@ -1,20 +1,36 @@
+"use client";
+
 import Link from "next/link";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { BookMockup } from "./book-mockup";
+import { useCart } from "@/lib/cart-context";
 
 type Props = {
   id: string;
   slug: string;
   title: string;
+  subject: string;
   groep: string;
   price: string;
+  priceCents: number;
   symbol: string;
   tint: string;
   highlightsCount?: number;
 };
 
-export function WorkbookCard({ slug, title, groep, price, symbol, tint, highlightsCount }: Props) {
+export function WorkbookCard({
+  slug,
+  title,
+  subject,
+  groep,
+  price,
+  priceCents,
+  symbol,
+  highlightsCount,
+}: Props) {
   const t = useTranslations("shop.card");
+  const { addWorkbook } = useCart();
   return (
     <article
       data-test="workbook-card"
@@ -22,14 +38,9 @@ export function WorkbookCard({ slug, title, groep, price, symbol, tint, highligh
     >
       <Link
         href={`/shop/boek/${slug}`}
-        className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        className="block bg-bg-2 p-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
-        <div
-          className={`flex items-center justify-center ${tint} aspect-square text-7xl font-display font-bold text-ink`}
-          aria-hidden="true"
-        >
-          {symbol}
-        </div>
+        <BookMockup title={title} subject={subject} groep={groep} symbol={symbol} size="card" />
       </Link>
       <div className="flex flex-1 flex-col p-4">
         <p className="font-mono text-xs uppercase tracking-wider text-ink-2">
@@ -47,12 +58,18 @@ export function WorkbookCard({ slug, title, groep, price, symbol, tint, highligh
           </p>
         ) : null}
         <p className="mt-3 font-display text-lg font-bold text-ink">{price}</p>
-        <Link
-          href={`/shop/boek/${slug}`}
-          className="mt-3 inline-flex items-center justify-center gap-1 rounded-lexi border border-line bg-card px-3 py-1.5 text-xs font-medium text-ink hover:bg-bg-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        <button
+          type="button"
+          data-test="add-to-cart"
+          onClick={(e) => {
+            e.preventDefault();
+            addWorkbook({ slug, title, priceCents }, 1);
+          }}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lexi bg-primary px-3 py-2 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
-          Bekijk boek <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-        </Link>
+          <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+          In winkelmand
+        </button>
       </div>
     </article>
   );

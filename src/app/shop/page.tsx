@@ -7,7 +7,7 @@ import { UitblinkerHero } from "@/components/shop/uitblinker-hero";
 import { WerkboekenGrid } from "@/components/shop/werkboeken-grid";
 import { CartPill } from "@/components/shop/cart-pill";
 import { TrustSignals } from "@/components/shop/trust-signals";
-import { centsToEuro, subjectToUi } from "@/lib/mappings";
+import { centsToEuro } from "@/lib/mappings";
 import { applyShopFilters } from "@/lib/shop-filter";
 import type { DbWorkbookSku } from "@/lib/db-types";
 
@@ -35,9 +35,10 @@ export default async function ShopPage({
     id: w.id,
     slug: w.slug,
     title: w.title,
-    subject: subjectToUi(w.subject),
+    subject: w.subject, // DB key — BookMockup keys palette by this
     groep: w.groepBucket,
     price: centsToEuro(w.priceCents),
+    priceCents: w.priceCents,
     symbol: w.coverSymbol,
     tint: w.tint,
     highlightsCount: Array.isArray(w.highlights) ? (w.highlights as unknown[]).length : 0,

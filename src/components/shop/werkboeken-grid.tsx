@@ -8,6 +8,7 @@ type Workbook = {
   subject: string;
   groep: string;
   price: string;
+  priceCents: number;
   symbol: string;
   tint: string;
   highlightsCount?: number;

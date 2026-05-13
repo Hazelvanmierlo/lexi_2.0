@@ -1,6 +1,11 @@
+"use client";
+
+import { CheckCircle2, ShoppingCart } from "lucide-react";
 import { centsToEuro, subjectLabel } from "@/lib/mappings";
 import { renderMarkdown } from "@/lib/markdown";
 import { BookHighlights } from "./book-highlights";
+import { BookMockup } from "./book-mockup";
+import { useCart } from "@/lib/cart-context";
 import type { DbWorkbookSku } from "@/lib/db-types";
 
 function highlightsArray(value: unknown): string[] {
@@ -12,16 +17,22 @@ export function BookDetail({ book }: { book: DbWorkbookSku }) {
   const highlights = highlightsArray(book.highlights);
   const blocks = renderMarkdown(book.description);
   const subjLabel = subjectLabel(book.subject);
+  const { addWorkbook } = useCart();
 
   return (
     <article>
       {/* Hero: cover left, meta right */}
       <div className="grid gap-8 md:grid-cols-2">
-        <div
-          className={`flex aspect-square w-full items-center justify-center rounded-lexi-lg border border-line ${book.tint} font-display text-[10rem] font-bold text-ink`}
-          aria-label={`Omslag voor ${book.title}`}
-        >
-          {book.coverSymbol}
+        <div className="flex w-full items-center justify-center rounded-lexi-lg border border-line bg-bg-2 p-6">
+          <div className="w-full max-w-[320px]">
+            <BookMockup
+              title={book.title}
+              subject={book.subject}
+              groep={book.groepBucket}
+              symbol={book.coverSymbol}
+              size="hero"
+            />
+          </div>
         </div>
         <div className="flex flex-col">
           <div className="flex flex-wrap gap-2">
@@ -38,13 +49,27 @@ export function BookDetail({ book }: { book: DbWorkbookSku }) {
           <p className="mt-4 font-display text-4xl font-bold text-ink">
             {centsToEuro(book.priceCents)}
           </p>
+          <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-ok">
+            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+            Op voorraad
+          </p>
           <button
             type="button"
-            className="mt-5 inline-flex w-full items-center justify-center rounded-lexi bg-primary px-5 py-3 text-sm font-semibold text-white shadow-lexi-sm hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:w-auto"
+            data-test="add-to-cart-detail"
+            onClick={() =>
+              addWorkbook(
+                { slug: book.slug, title: book.title, priceCents: book.priceCents },
+                1,
+              )
+            }
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lexi bg-primary px-5 py-3 text-base font-semibold text-white shadow-lexi-sm hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:w-auto"
           >
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             In winkelmandje
           </button>
-          <p className="mt-2 text-xs text-ink-2">Bezorging: gratis vanaf € 25</p>
+          <p className="mt-2 text-xs text-ink-2">
+            Morgen in huis · Gratis bezorging vanaf € 25
+          </p>
 
           {highlights.length > 0 ? (
             <div className="mt-6">

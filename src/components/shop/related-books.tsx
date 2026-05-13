@@ -16,8 +16,10 @@ export function RelatedBooks({ books, groep }: { books: DbWorkbookSku[]; groep: 
               id={b.id}
               slug={b.slug}
               title={b.title}
+              subject={b.subject}
               groep={b.groepBucket}
               price={centsToEuro(b.priceCents)}
+              priceCents={b.priceCents}
               symbol={b.coverSymbol}
               tint={b.tint}
               highlightsCount={
