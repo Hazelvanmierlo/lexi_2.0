@@ -216,6 +216,7 @@ model WorkbookSku {
   coverImageUrl String?
   highlights    Json     @default("[]") // string[] selling bullets
   active        Boolean  @default(true)
+  sortOrder     Int      @default(0) // popularity sort; lower = more popular (seed-time heuristic)
   createdAt     DateTime @default(now())
 
   @@index([groepBucket, subject])

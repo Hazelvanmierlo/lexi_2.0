@@ -426,6 +426,11 @@ async function seedShop() {
   // Workbooks: replace existing rows wholesale with 24 (3 subjects × 8 groeps).
   // The spec moves groepBucket from "1-2"/"3-4"/... to single digits "1".."8".
   await db.workbookSku.deleteMany({});
+  // sortOrder heuristic: lower = more popular. Younger groeps for Taal/Rekenen
+  // are the strongest sellers in Junior-Einstein-like shops; Lezen has a
+  // middle-groep peak. Formula: groep * 10 + subjectOrder (1=Taal, 2=Rekenen,
+  // 3=Lezen). Real popularity replaces this when order-history exists.
+  const SUBJECT_ORDER: Record<string, number> = { TAAL: 1, REKENEN: 2, LEZEN: 3 };
   for (const s of WORKBOOK_SUBJECTS) {
     for (let n = 1; n <= 8; n++) {
       const slug = `${s.key.toLowerCase()}-groep-${n}`;
@@ -442,6 +447,7 @@ async function seedShop() {
           pages: 64,
           isbn: workbookIsbn(s.key, n),
           highlights: WORKBOOK_HIGHLIGHTS,
+          sortOrder: n * 10 + SUBJECT_ORDER[s.key],
         },
       });
     }
