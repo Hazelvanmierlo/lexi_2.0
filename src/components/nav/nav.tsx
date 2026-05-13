@@ -12,7 +12,7 @@ export function Nav() {
     { label: t("together"),   href: "/#samen" },
     { label: t("subjects"),   href: "/#vakken" },
     { label: t("shop"),       href: "/shop" },
-    { label: t("pricing"),    href: "/#prijzen" },
+    { label: t("wordLid"),    href: "/word-lid" },
     { label: t("faq"),        href: "/#faq" },
   ];
   return (
