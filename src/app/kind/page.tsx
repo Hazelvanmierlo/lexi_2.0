@@ -9,7 +9,6 @@ import { gameTypeToUi, subjectToUi, subjectTokens } from "@/lib/mappings";
 import { masteryPct } from "@/lib/mastery";
 import { recommend } from "@/lib/recommend";
 import { currentKid, currentHousehold } from "@/lib/auth";
-import { setKidCookie } from "@/lib/kid-cookie";
 import type {
   DbHousehold,
   DbKid,
@@ -39,11 +38,12 @@ export default async function KindPage() {
   if (authEnabled) {
     kid = (await currentKid()) as DbKid | null;
     if (!kid) {
+      // Server Components cannot set cookies — delegate cookie-setting
+      // to a Route Handler that bounces back to /kind once the cookie is set.
       const hh = await currentHousehold();
       if (!hh) redirect("/login?next=/kind");
       if (hh.kids.length === 1) {
-        await setKidCookie(hh.kids[0].id);
-        kid = hh.kids[0] as DbKid;
+        redirect("/api/kind/auto-pick");
       } else {
         redirect("/kind/picker");
       }
